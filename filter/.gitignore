@@ -1,3 +1,6 @@
 # the credentions to Citroen Service
 
 /cs_credential.txt
+
+# commands to import into shell
+/env-filter-input.sh
