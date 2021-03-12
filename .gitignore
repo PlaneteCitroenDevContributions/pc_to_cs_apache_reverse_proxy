@@ -1,6 +1,8 @@
 # Emacs backups
 *~
 
+/tmp
+
 # for reminder
 .env
 .venv
