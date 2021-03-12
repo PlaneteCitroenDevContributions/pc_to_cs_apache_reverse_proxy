@@ -1,0 +1,15 @@
+# -*- mode: indented-text; tab-width: 3; indent-tabs-mode: nil -*-
+# $Id: docker-compose.yml,v 1.2 2021/02/22 11:46:07 orba6563 Exp $
+
+version: '3'
+
+services:
+
+  reverse-proxy-to-cs:
+     image: pcrproxy
+     restart: unless-stopped
+     ports:
+        - 7777:80
+     volumes:
+        - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
+        - ./filter/:/filter/
