@@ -130,35 +130,7 @@ generateStatisticEntry ()
     local status="$3"
 
     (
-	echo "\
-Date\t\
-login PC\t\
-Action\t\
-Status\t\
-Adresse IP\t\
-Navigateur\
-"
-	local csv_date=$( date --iso-8601 )
-	echo "\
-${csv_date}\t\
-${userid}\t\
-${reason}\t\
-${status}\t\
-${HTTP_X_REAL_IP}\t\
-${HTTP_USER_AGENT}\
-"
-    ) > "${_log_dir_}/stat_$$.csv"
-}
-
-generateStatisticEntry ()
-{
-    local reason="$1"
-    local userid="$2"
-    local status="$3"
-
-    (
-        echo "\
-Date;login PC;Action;Status;Adresse IP;Navigateur"
+        echo "Date;login PC;Action;Status;Adresse IP;Navigateur"
 
         local csv_date=$( date '+%x %T' )
         echo "${csv_date};\"${userid}\";${reason};${status};\"${HTTP_X_REAL_IP}\
@@ -166,8 +138,6 @@ Date;login PC;Action;Status;Adresse IP;Navigateur"
     ) > "${_log_dir_}/stat_$$.csv"
 }
 
-
-	
 #
 # DEBUG
 # =====
