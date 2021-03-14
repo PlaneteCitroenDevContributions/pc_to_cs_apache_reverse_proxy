@@ -10,6 +10,9 @@ CREDENTIAL_FILE="${HERE}/cs_credential.txt"
 _debug_dir_="${HERE}/DEBUG/debug_request_$$"
 mkdir -p "${_debug_dir_}"
 
+_log_dir_="${HERE}/logs/log_$$"
+mkdir -p "${_log_dir_}"
+
 : ${STDERR:="${_debug_dir_}/filter-input_stderr.txt"}
 exec 2>>"${STDERR}"
 
@@ -21,7 +24,7 @@ fi
 in_file="/tmp/in.txt.$$"
 corrected_in_file="/tmp/corrected_in.txt.$$"
 
-: ${log_file:="${_debug_dir_}/logs.txt"}
+: ${trace_file:="${_debug_dir_}/trace.txt"}
 
 : ${check_pc_user_pgm:="${HERE}/checkVBulletinUser.sh"}
 
@@ -115,7 +118,61 @@ checkUserpassword ()
     esac
 
 }
+
+#
+# add statistic entry
+# ===================
+
+generateStatisticEntry ()
+{
+    local reason="$1"
+    local userid="$2"
+    local status="$3"
+
+    (
+	echo "\
+Date\t\
+login PC\t\
+Action\t\
+Status\t\
+Adresse IP\t\
+Navigateur\
+"
+	local csv_date=$( date --iso-8601 )
+	echo "\
+${csv_date}\t\
+${userid}\t\
+${reason}\t\
+${status}\t\
+${HTTP_X_REAL_IP}\t\
+${HTTP_USER_AGENT}\
+"
+    ) > "${_log_dir_}/stat_$$.csv"
+}
+
+generateStatisticEntry ()
+{
+    local reason="$1"
+    local userid="$2"
+    local status="$3"
+
+    (
+        echo "\
+Date;login PC;Action;Status;Adresse IP;Navigateur"
+
+        local csv_date=$( date '+%x %T' )
+        echo "${csv_date};\"${userid}\";${reason};${status};\"${HTTP_X_REAL_IP}\
+\";\"${HTTP_USER_AGENT}\""
+    ) > "${_log_dir_}/stat_$$.csv"
+}
+
+
 	
+#
+# DEBUG
+# =====
+#
+
 (
     echo 'vvvvvvvvvvvvvvvvvvvvvvv'
     date
@@ -124,7 +181,15 @@ checkUserpassword ()
     cat "${in_file}"
     echo '<==========================================='
     echo '-----------------------'
-) >> "${log_file}"
+) >> "${trace_file}"
+
+#
+# MAIN
+# ====
+#
+# select behavior depending on URL
+#
+
 
 case "${REQUEST_URI}" in
     "/elapseTime" )
@@ -153,6 +218,7 @@ case "${REQUEST_URI}" in
 	    sed -e 's/.*&password=\([^&]*\)&.*/\1/' "${in_file}"
 	      )
 
+	pc_login_success=false
 	loginUserid="bad_planete_citroen_association_login_${username}"
 	loginPassword="bad_planete_citroen_association_password_${password}"
 	if checkUsername "${userid}"
@@ -163,10 +229,19 @@ case "${REQUEST_URI}" in
 	    then
 		loginUserid="${cs_login}"
 		loginPassword="${cs_password}"
+		pc_login_success=true
 	    fi
 	fi
 
 	sed -e 's/&userid=[^&]*&password=[^&]*&/\&userid='${loginUserid}'\&password='${loginPassword}'\&/' "${in_file}" > "${corrected_in_file}"
+
+	if ${pc_login_success}
+	then
+	    generateStatisticEntry login "${userid}" success
+	else
+	    generateStatisticEntry login "${userid}" fail
+	fi
+
 	;;
 
     * )
@@ -185,7 +260,7 @@ esac
     echo "Got password: ${password}"
     echo "Used loginPassword: ${loginPassword}"
     echo '^^^^^^^^^^^^^^^^^^^^^^^^'
-) >> "${log_file}"
+) >> "${trace_file}"
 
 cat "${corrected_in_file}"
 
