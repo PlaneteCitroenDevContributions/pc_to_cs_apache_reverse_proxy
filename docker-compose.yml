@@ -7,8 +7,6 @@ services:
   reverse-proxy-to-cs:
      image: pcrproxy
      restart: unless-stopped
-     ports:
-        - 7777:80
      volumes:
         - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
         - ./filter/:/filter/
