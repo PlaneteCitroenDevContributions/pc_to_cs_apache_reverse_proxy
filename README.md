@@ -1,3 +1,6 @@
+# To be done!
+
+Notes:
 https://stackoverflow.com/questions/14078426/login-to-site-with-curl-in-vbulletin
 
 https://gist.github.com/saltun/0490cdd8598dce10831e
