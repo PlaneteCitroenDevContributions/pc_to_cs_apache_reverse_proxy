@@ -10,8 +10,8 @@ CREDENTIAL_FILE="${HERE}/cs_credential.txt"
 _debug_dir_="${HERE}/DEBUG/debug_request_$$"
 mkdir -p "${_debug_dir_}"
 
-_log_dir_="${HERE}/logs/log_$$"
-mkdir -p "${_log_dir_}"
+STAT_DATA_DIR="${HERE}/logs/log_$$"
+mkdir -p "${STAT_DATA_DIR}"
 
 : ${STDERR:="${_debug_dir_}/filter-input_stderr.txt"}
 exec 2>>"${STDERR}"
@@ -135,7 +135,7 @@ generateStatisticEntry ()
         local csv_date=$( date '+%x %T' )
         echo "${csv_date};\"${userid}\";${reason};${status};\"${HTTP_X_REAL_IP}\
 \";\"${HTTP_USER_AGENT}\""
-    ) > "${_log_dir_}/stat_$$.csv"
+    ) > "${STAT_DATA_DIR}/stat_$$.csv"
 }
 
 #
