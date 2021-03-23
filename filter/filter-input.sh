@@ -2,18 +2,21 @@
 
 # $Id: filter-input.sh,v 1.22 2021/03/08 18:35:05 orba6563 Exp $
 
+set -x
+
 HERE=$( dirname "$0" )
 PGM_BASENAME=$( basename "$0" )
 ENV_FILE="${HERE}/env-${PGM_BASENAME}"
 CREDENTIAL_FILE="${HERE}/cs_credential.txt"
 
-: ${PC_DEBUG_DIR:="${HERE}/DEBUG/debug_request_$$"}
-mkdir -p "${PC_DEBUG_DIR}"
+: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
+_debug_dir_="${DEBUG_ROOT_DIR}/debug_request_$$"
+mkdir -m 777 -p "${_debug_dir_}"
 
 _stat_file_="${STAT_DATA_DIR}/stat_$$.txt"
 mkdir -p "${STAT_DATA_DIR}"
 
-: ${STDERR:="${PC_DEBUG_DIR}/filter-input_stderr.txt"}
+: ${STDERR:="${_debug_dir_}/filter-input_stderr.txt"}
 exec 2>>"${STDERR}"
 
 if [[ -x "${ENV_FILE}" ]]
@@ -24,7 +27,7 @@ fi
 in_file="/tmp/in.txt.$$"
 corrected_in_file="/tmp/corrected_in.txt.$$"
 
-: ${trace_file:="${PC_DEBUG_DIR}/shell_trace.txt"}
+: ${trace_file:="${_debug_dir_}/shell_trace.txt"}
 
 : ${check_pc_user_pgm:="${HERE}/checkVBulletinUser.sh"}
 
@@ -70,10 +73,12 @@ checkUsername ()
 
     # bypass
     return 0
+    # NOT REACHED
 
     case "${username}" in
 
 	"pc1" )
+	    # FIXME: to remove
 	    : # nop
 	    ;;
 	"pc2")
@@ -95,6 +100,7 @@ checkUserpassword ()
 
     case "${username}" in
 
+	# FIXME: to remove
 	"pc1" )
 	    if [[ "${password}" == "pc1pass" ]]
 	    then
@@ -232,5 +238,5 @@ esac
 
 cat "${corrected_in_file}"
 
-cp "${in_file}" "${corrected_in_file}" "${PC_DEBUG_DIR}"
+cp "${in_file}" "${corrected_in_file}" "${_debug_dir_}"
 rm -f "${in_file}" "${corrected_in_file}"
