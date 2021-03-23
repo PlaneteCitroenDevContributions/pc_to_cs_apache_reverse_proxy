@@ -5,7 +5,7 @@
 HERE=$( dirname "$0" )
 
 _debug_dir_="${HERE}/DEBUG/debug_response_$$"
-mkdir -p "${_debug_dir_}"
+mkdir -m 777 -p "${_debug_dir_}"
 
 : ${log_file:="${_debug_dir_}/logs.txt"}
 
