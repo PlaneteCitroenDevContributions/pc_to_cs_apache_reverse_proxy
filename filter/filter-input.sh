@@ -7,13 +7,13 @@ PGM_BASENAME=$( basename "$0" )
 ENV_FILE="${HERE}/env-${PGM_BASENAME}"
 CREDENTIAL_FILE="${HERE}/cs_credential.txt"
 
-_debug_dir_="${HERE}/DEBUG/debug_request_$$"
-mkdir -p "${_debug_dir_}"
+: ${PC_DEBUG_DIR:="${HERE}/DEBUG/debug_request_$$"}
+mkdir -p "${PC_DEBUG_DIR}"
 
-STAT_DATA_DIR="${HERE}/logs/log_$$"
+_stat_file_="${STAT_DATA_DIR}/stat_$$.txt"
 mkdir -p "${STAT_DATA_DIR}"
 
-: ${STDERR:="${_debug_dir_}/filter-input_stderr.txt"}
+: ${STDERR:="${PC_DEBUG_DIR}/filter-input_stderr.txt"}
 exec 2>>"${STDERR}"
 
 if [[ -x "${ENV_FILE}" ]]
@@ -24,7 +24,7 @@ fi
 in_file="/tmp/in.txt.$$"
 corrected_in_file="/tmp/corrected_in.txt.$$"
 
-: ${trace_file:="${_debug_dir_}/trace.txt"}
+: ${trace_file:="${PC_DEBUG_DIR}/shell_trace.txt"}
 
 : ${check_pc_user_pgm:="${HERE}/checkVBulletinUser.sh"}
 
@@ -130,12 +130,10 @@ generateStatisticEntry ()
     local status="$3"
 
     (
-        echo "Date;login PC;Action;Status;Adresse IP;Navigateur"
-
         local csv_date=$( date '+%x %T' )
         echo "${csv_date};\"${userid}\";${reason};${status};\"${HTTP_X_REAL_IP}\
 \";\"${HTTP_USER_AGENT}\""
-    ) > "${STAT_DATA_DIR}/stat_$$.csv"
+    ) > "${_stat_file_}"
 }
 
 #
@@ -234,5 +232,5 @@ esac
 
 cat "${corrected_in_file}"
 
-cp "${in_file}" "${corrected_in_file}" "${_debug_dir_}"
+cp "${in_file}" "${corrected_in_file}" "${PC_DEBUG_DIR}"
 rm -f "${in_file}" "${corrected_in_file}"
