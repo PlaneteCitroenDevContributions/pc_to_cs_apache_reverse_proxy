@@ -1,7 +1,5 @@
 #! /bin/bash
 
-# $Id: filter-input.sh,v 1.22 2021/03/08 18:35:05 orba6563 Exp $
-
 HERE=$( dirname "$0" )
 PGM_BASENAME=$( basename "$0" )
 ENV_FILE="${HERE}/env-${PGM_BASENAME}"
