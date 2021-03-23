@@ -2,8 +2,6 @@
 
 # $Id: filter-input.sh,v 1.22 2021/03/08 18:35:05 orba6563 Exp $
 
-set -x
-
 HERE=$( dirname "$0" )
 PGM_BASENAME=$( basename "$0" )
 ENV_FILE="${HERE}/env-${PGM_BASENAME}"
@@ -13,10 +11,7 @@ CREDENTIAL_FILE="${HERE}/cs_credential.txt"
 _debug_dir_="${DEBUG_ROOT_DIR}/debug_request_$$"
 mkdir -m 777 -p "${_debug_dir_}"
 
-_stat_file_="${STAT_DATA_DIR}/stat_$$.txt"
-mkdir -p "${STAT_DATA_DIR}"
-
-: ${STDERR:="${_debug_dir_}/filter-input_stderr.txt"}
+: ${STDERR:="${_debug_dir_}/stderr.txt"}
 exec 2>>"${STDERR}"
 
 if [[ -x "${ENV_FILE}" ]]
@@ -24,10 +19,14 @@ then
     source "${ENV_FILE}"
 fi
 
+: ${STAT_DATA_DIR:="/var/pc_stats"}
+_stat_file_="${STAT_DATA_DIR}/stat_$$.txt"
+mkdir -p "${STAT_DATA_DIR}"
+
 in_file="/tmp/in.txt.$$"
 corrected_in_file="/tmp/corrected_in.txt.$$"
 
-: ${trace_file:="${_debug_dir_}/shell_trace.txt"}
+: ${trace_file:="${_debug_dir_}/trace.txt"}
 
 : ${check_pc_user_pgm:="${HERE}/checkVBulletinUser.sh"}
 

@@ -8,7 +8,8 @@ services:
      image: pcrproxy
      restart: unless-stopped
      environment:
-        - STAT_DATA_DIR=""
+        - STAT_DATA_DIR="/var/pc_stats"
      volumes:
         - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
         - ./filter/:/filter/
+        - ./pc_stats/:/var/pc_stats/
