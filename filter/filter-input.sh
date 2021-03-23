@@ -135,9 +135,8 @@ generateStatisticEntry ()
     local status="$3"
 
     (
-        local csv_date=$( date '+%x %T' )
-        echo "${csv_date};\"${userid}\";${reason};${status};\"${HTTP_X_REAL_IP}\
-\";\"${HTTP_USER_AGENT}\""
+        local stat_date=$( date '--iso-8601=seconds' )
+        echo "\"${stat_date}\" \"${userid}\" \"${reason}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
     ) > "${_stat_file_}"
 }
 
