@@ -147,7 +147,8 @@ generateStatisticEntry ()
     
     local stat_file="${STAT_DATA_DIR}/stat${date_filename_part}_$$.txt"
     (
-        local stat_date=$( date '--iso-8601=seconds' )
+	# use date since epoch to easy line sorting later
+        local stat_date=$( date '+%s' )
         echo "\"${stat_date}\" \"${userid}\" \"${reason}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
     ) > "${stat_file}"
 }
