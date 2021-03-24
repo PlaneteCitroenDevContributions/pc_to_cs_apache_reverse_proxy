@@ -3,7 +3,6 @@
 HERE=$( dirname "$0" )
 PGM_BASENAME=$( basename "$0" )
 ENV_FILE="${HERE}/env-${PGM_BASENAME}"
-CREDENTIAL_FILE="${HERE}/cs_credential.txt"
 
 : ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
 _debug_dir_="${DEBUG_ROOT_DIR}/debug_request_$$"
@@ -32,6 +31,7 @@ corrected_in_file="/tmp/corrected_in.txt.$$"
 # get cs credentials from credential file
 #
 
+: ${CREDENTIAL_FILE:="${HERE}/cs_credential.txt"}
 cs_login=$(
     grep cs_login "${CREDENTIAL_FILE}" | cut -d '=' -f 2 | tr -d ' '
 )
