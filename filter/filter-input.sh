@@ -16,10 +16,6 @@ then
     source "${ENV_FILE}"
 fi
 
-: ${STAT_DATA_DIR:="/var/pc_stats"}
-_stat_file_="${STAT_DATA_DIR}/stat_$$.txt"
-mkdir -p "${STAT_DATA_DIR}"
-
 in_file="/tmp/in.txt.$$"
 corrected_in_file="/tmp/corrected_in.txt.$$"
 
@@ -126,16 +122,34 @@ checkUserpassword ()
 # add statistic entry
 # ===================
 
+: ${STAT_DATA_DIR:="/var/pc_stats"}
+# TODO: better test of the directory
+mkdir -p "${STAT_DATA_DIR}"
+
 generateStatisticEntry ()
 {
     local reason="$1"
     local userid="$2"
     local status="$3"
 
+    local current_year=$( date '+%Y' )
+    local current_month=$( date '+%m' )
+    local current_day_number=$( date '+%d' )
+    local current_weekday=$( date '+%u' )
+    local current_week_number=$( date '+%V' )
+
+    local date_filename_part=""
+    date_filename_part="${date_filename_part}_Y=${current_year}=Y"
+    date_filename_part="${date_filename_part}_M=${current_month}=M"
+    date_filename_part="${date_filename_part}_D=${current_day_number}=D"
+    date_filename_part="${date_filename_part}_d=${current_weekday}=d"
+    date_filename_part="${date_filename_part}_W=${current_week_number}=W"
+    
+    local stat_file="${STAT_DATA_DIR}/stat${date_filename_part}_$$.txt"
     (
         local stat_date=$( date '--iso-8601=seconds' )
         echo "\"${stat_date}\" \"${userid}\" \"${reason}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
-    ) > "${_stat_file_}"
+    ) > "${stat_file}"
 }
 
 #
