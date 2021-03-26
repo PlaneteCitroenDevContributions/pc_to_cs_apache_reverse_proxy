@@ -66,13 +66,75 @@ all_stat_files=$(
     ls -1 "${STAT_DATA_DIR}/"stat_Y=${STATS_FOR_YEAR}=Y*W=${week_number}=W*.txt 2>/dev/null
 )
 
-echo ${all_stat_files}
+generateCSVStatLine ()
+{
+    # sample line:
+    # "1616779865" "bernhara" "login" "success" "90.8.128.173" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
+    
+    line="$@"
+    echo ">>>>>>>>>>>>>>>>>>>>>${line}<<<<<<<<<<<<<<<<<<<<<"
+
+    protected_line=$(
+	echo "${line}" | \
+	    sed \
+		-e "s/^\"/'/" \
+		-e "s/\" \"/' '/g" \
+		-e "s/\"$/'/"
+   )
+    
+
+    echo ">>>>>>>>>>>>>>>>>>>>>${protected_line}<<<<<<<<<<<<<<<<<<<<<"
+
+    for i in ${protected_line}
+    do
+
+	echo "XXXX${i}YYYY"
+    done
+
+    # FIXME: eval should ne be required
+    eval declare -a tab=( "${protected_line}" )
+
+    epoch_time=${tab[0]}
+    pc_login=${tab[1]}
+    reason=${tab[2]}
+    result=${tab[3]}
+    real_ip=${tab[4]}
+    user_agent=${tab[5]}
+
+    #TODO: continue
+    exit 1
+
+}
 
 sort \
     --numeric-sort \
     --key=1 \
     -o /tmp/starts_sorted.txt \
     ${all_stat_files}
+
+cat /tmp/starts_sorted.txt | \
+    while read -r line
+    do
+	generateCSVStatLine "${line}"
+    done
+
+exit 1
+
+{
+    local reason="$1"
+    local userid="$2"
+    local status="$3"
+
+    (
+        echo "Date;login PC;Action;Status;Adresse IP;Navigateur"
+
+        local csv_date=$( date '+%x %T' )
+        echo "${csv_date};\"${userid}\";${reason};${status};\"${HTTP_X_REAL_IP}\
+\";\"${HTTP_USER_AGENT}\""
+    ) > "${_log_dir_}/stat_$$.csv"
+}
+
+
 exit 1
 
 generateStatisticEntry ()
@@ -101,4 +163,6 @@ generateStatisticEntry ()
         echo "\"${stat_date}\" \"${userid}\" \"${reason}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
     ) > "${stat_file}"
 }
+
+
 
