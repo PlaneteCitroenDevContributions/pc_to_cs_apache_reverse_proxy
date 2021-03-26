@@ -72,7 +72,7 @@ generateCSVStatLine ()
     # "1616779865" "bernhara" "login" "success" "90.8.128.173" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"
     
     line="$@"
-    echo ">>>>>>>>>>>>>>>>>>>>>${line}<<<<<<<<<<<<<<<<<<<<<"
+    # echo ">>>>>>>>>>>>>>>>>>>>>${line}<<<<<<<<<<<<<<<<<<<<<"
 
     protected_line=$(
 	echo "${line}" | \
@@ -83,13 +83,7 @@ generateCSVStatLine ()
    )
     
 
-    echo ">>>>>>>>>>>>>>>>>>>>>${protected_line}<<<<<<<<<<<<<<<<<<<<<"
-
-    for i in ${protected_line}
-    do
-
-	echo "XXXX${i}YYYY"
-    done
+    # echo ">>>>>>>>>>>>>>>>>>>>>${protected_line}<<<<<<<<<<<<<<<<<<<<<"
 
     # FIXME: eval should ne be required
     eval declare -a tab=( "${protected_line}" )
