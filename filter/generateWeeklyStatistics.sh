@@ -44,8 +44,8 @@ fi
 : ${STATS_FOR_YEAR:=$( date '+%Y' )}
 
 #
-# add statistic entry
-# ===================
+# Check the folder containing the stats
+# =====================================
 
 : ${STAT_DATA_DIR:="/var/pc_stats"}
 
@@ -57,7 +57,17 @@ else
     exit 1
 fi
 
+#
+# Get all files of the week
+#
 
+# example file name: stat_Y=2021=Y_M=03=M_D=24=D_d=3=d_W=12=W_156.txt
+all_stat_files=$(
+    ls -1 "${STAT_DATA_DIR}/stat_Y=${STATS_FOR_YEAR}=Y*W=${week_number}=W*.txt"
+)
+
+
+exit 1
 
 generateStatisticEntry ()
 {
@@ -86,101 +96,3 @@ generateStatisticEntry ()
     ) > "${stat_file}"
 }
 
-#
-# DEBUG
-# =====
-#
-
-(
-    echo 'vvvvvvvvvvvvvvvvvvvvvvv'
-    date
-    export
-    echo -n '===========================================>'
-    cat "${in_file}"
-    echo '<==========================================='
-    echo '-----------------------'
-) >> "${trace_file}"
-
-#
-# MAIN
-# ====
-#
-# select behavior depending on URL
-#
-
-
-case "${REQUEST_URI}" in
-    "/elapseTime" )
-	body=$( cat "${in_file}" )
-	#content = username=XXXXX
-	username=${body#username=}
-
-	if checkUsername "${username}"
-	then
-	    elapseTimeUserName="${cs_login}"
-	else
-	    elapseTimeUserName="bad_planete_citroen_assosiation_login_${username}"
-	fi
-
-	sed -e 's/username=.*$/username='${elapseTimeUserName}'/' "${in_file}" > "${corrected_in_file}"
-	;;
-
-    "/do/login" )
-	#
-	# get provided credential
-	#
-	userid=$(
-	    sed -e 's/.*&userid=\([^&]*\)&.*/\1/' "${in_file}"
-	      )
-	password=$(
-	    sed -e 's/.*&password=\([^&]*\)&.*/\1/' "${in_file}"
-	      )
-
-	pc_login_success=false
-	loginUserid="bad_planete_citroen_association_login_${username}"
-	loginPassword="bad_planete_citroen_association_password_${password}"
-	if checkUsername "${userid}"
-	then
-	    url_decoded_user_id=$( url_decode "${userid}" )
-	    url_decoded_password=$( url_decode "${password}" )
-	    if checkUserpassword "${url_decoded_user_id}" "${url_decoded_password}"
-	    then
-		loginUserid="${cs_login}"
-		loginPassword="${cs_password}"
-		pc_login_success=true
-	    fi
-	fi
-
-	sed -e 's/&userid=[^&]*&password=[^&]*&/\&userid='${loginUserid}'\&password='${loginPassword}'\&/' "${in_file}" > "${corrected_in_file}"
-
-	if ${pc_login_success}
-	then
-	    generateStatisticEntry login "${userid}" success
-	else
-	    generateStatisticEntry login "${userid}" fail
-	fi
-
-	;;
-
-    * )
-	cp "${in_file}" "${corrected_in_file}"
-	;;
-esac
-
-(
-    echo -n '++++++++++++++++++++++++++++++++++++>'
-    cat "${corrected_in_file}"
-    echo '<++++++++++++++++++++++++++++++++++++'
-    echo "Got username: ${username}"
-    echo "Used elapseTimeUserName: ${elapseTimeUserName}"
-    echo "Got userid: ${userid}"
-    echo "Used loginUserid: ${loginUserid}"
-    echo "Got password: ${password}"
-    echo "Used loginPassword: ${loginPassword}"
-    echo '^^^^^^^^^^^^^^^^^^^^^^^^'
-) >> "${trace_file}"
-
-cat "${corrected_in_file}"
-
-cp "${in_file}" "${corrected_in_file}" "${_debug_dir_}"
-rm -f "${in_file}" "${corrected_in_file}"
