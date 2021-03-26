@@ -63,10 +63,16 @@ fi
 
 # example file name: stat_Y=2021=Y_M=03=M_D=24=D_d=3=d_W=12=W_156.txt
 all_stat_files=$(
-    ls -1 "${STAT_DATA_DIR}/"stat_Y=${STATS_FOR_YEAR}=Y*W=${week_number}=W*.txt
+    ls -1 "${STAT_DATA_DIR}/"stat_Y=${STATS_FOR_YEAR}=Y*W=${week_number}=W*.txt 2>/dev/null
 )
 
+echo ${all_stat_files}
 
+sort \
+    --numeric-sort \
+    --key=1 \
+    -o /tmp/starts_sorted.txt \
+    ${all_stat_files}
 exit 1
 
 generateStatisticEntry ()
