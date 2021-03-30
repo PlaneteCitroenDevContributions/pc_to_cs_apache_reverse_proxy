@@ -95,7 +95,7 @@ generateCSVStatLine ()
     user_agent=${tab[5]}
 
     csv_date=$( date --date "@${epoch_time}" '+%x %T' )
-    echo "${csv_date};\"${pc_login}\";${reason};${status};\"${real_ip}\";\"${user_agent}\""
+    echo "\"${csv_date}\";\"${pc_login}\";\"${reason}\";\"${status}\";\"${real_ip}\";\"${user_agent}\""
 
 }
 
@@ -103,7 +103,7 @@ generateCSVStatLine ()
 # generate CSV file
 #
 
-echo "Date;login PC;Action;Status;Adresse IP;Navigateur"
+echo '"Date";"login PC";"Action";"Status";"Adresse IP";"Navigateur"'
 
 sort \
     --numeric-sort \
