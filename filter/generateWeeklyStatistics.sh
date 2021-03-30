@@ -25,7 +25,7 @@ fi
 
 week_number="$1"
 
-if expr "${week_number}" + 0 2>/dev/null
+if expr "${week_number}" + 0 1>/dev/null 2>/dev/null
 then
     :
 else
