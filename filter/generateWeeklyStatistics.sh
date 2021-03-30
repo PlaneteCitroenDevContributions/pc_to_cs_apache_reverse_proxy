@@ -82,7 +82,6 @@ generateCSVStatLine ()
 		-e "s/\"$/'/"
    )
     
-
     # echo ">>>>>>>>>>>>>>>>>>>>>${protected_line}<<<<<<<<<<<<<<<<<<<<<"
 
     # FIXME: eval should ne be required
@@ -91,12 +90,12 @@ generateCSVStatLine ()
     epoch_time=${tab[0]}
     pc_login=${tab[1]}
     reason=${tab[2]}
-    result=${tab[3]}
+    status=${tab[3]}
     real_ip=${tab[4]}
     user_agent=${tab[5]}
 
-    #TODO: continue
-    exit 1
+    local csv_date=$( date --date "@${epoch_time}" '+%x %T' )
+    echo "${csv_date};\"${pc_login}\";${reason};${status};\"${real_ip}\";\"${user_agent}\""
 
 }
 
@@ -114,22 +113,6 @@ cat /tmp/starts_sorted.txt | \
 
 exit 1
 
-{
-    local reason="$1"
-    local userid="$2"
-    local status="$3"
-
-    (
-        echo "Date;login PC;Action;Status;Adresse IP;Navigateur"
-
-        local csv_date=$( date '+%x %T' )
-        echo "${csv_date};\"${userid}\";${reason};${status};\"${HTTP_X_REAL_IP}\
-\";\"${HTTP_USER_AGENT}\""
-    ) > "${_log_dir_}/stat_$$.csv"
-}
-
-
-exit 1
 
 generateStatisticEntry ()
 {
