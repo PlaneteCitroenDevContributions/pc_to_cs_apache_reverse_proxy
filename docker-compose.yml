@@ -9,6 +9,7 @@ services:
      restart: unless-stopped
      environment:
         - STAT_DATA_DIR="/var/pc_stats"
+        - TZ=Europe/Paris
      volumes:
         - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
         - ./filter/:/filter/
