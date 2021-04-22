@@ -7,3 +7,16 @@ services:
   reverse-proxy-to-cs:
      ports:
         - 7777:80
+  environment:
+     VIRTUAL_HOST: cs.pctest.freeddns.org
+     VIRTUAL_PORT: 7777
+     LETSENCRYPT_HOST: cs.pctest.freeddns.org
+     LETSENCRYPT_EMAIL: raphael.bernhard@orange.fr
+  networks:
+     - auto_https_reverse_proxy
+
+
+networks:
+  auto_https_reverse_proxy:
+    external:
+      name: webservices
