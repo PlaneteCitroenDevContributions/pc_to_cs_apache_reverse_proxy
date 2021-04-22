@@ -6,7 +6,6 @@ services:
 
   reverse-proxy-to-cs:
      image: pcrproxy
-     restart: unless-stopped
      environment:
         - STAT_DATA_DIR="/var/pc_stats"
         - TZ=Europe/Paris
