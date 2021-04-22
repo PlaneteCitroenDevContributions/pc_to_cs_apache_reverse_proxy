@@ -15,7 +15,6 @@ services:
   networks:
      - auto_https_reverse_proxy
 
-
 networks:
   auto_https_reverse_proxy:
     external:
