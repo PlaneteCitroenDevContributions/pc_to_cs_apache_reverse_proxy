@@ -7,11 +7,11 @@ services:
   reverse-proxy-to-cs:
      restart: unless-stopped
      ports:
-        - 7777:80
+        - 8888:80
      environment:
-        - VIRTUAL_HOST=cs.pctest.freeddns.org
-        - VIRTUAL_PORT=7777
-        - LETSENCRYPT_HOST=cs.pctest.freeddns.org
+        - VIRTUAL_HOST=csdepc.planete-citroen.com
+        - VIRTUAL_PORT=8888
+        - LETSENCRYPT_HOST=csdepc.planete-citroen.com
         - LETSENCRYPT_EMAIL=raphael.bernhard@orange.fr
      networks:
         - auto_https_reverse_proxy
