@@ -104,6 +104,10 @@ generateCSVStatLine ()
 	    doc_ref="${param}"
 	    ;;
 
+	"vin_select" )
+	    vin="${param}"
+	    ;;
+
 	*)
 	    echo "ERROR: bas action ${action}" 1>&2
 	    ;;
@@ -111,7 +115,7 @@ generateCSVStatLine ()
       
 
     csv_date=$( date --date "@${epoch_time}" '+%x %T' )
-    echo "\"${csv_date}\";\"${action}\";\"${status}\";\"${pc_login}\";\"${doc_ref}\";\"${real_ip}\";\"${user_agent}\""
+    echo "\"${csv_date}\";\"${action}\";\"${status}\";\"${pc_login}\";\"${doc_ref}\";\"${VIN}\";\"${real_ip}\";\"${user_agent}\""
 
 }
 
@@ -119,7 +123,7 @@ generateCSVStatLine ()
 # generate CSV file
 #
 
-echo '"Date";"Action";"Status";"login PC";"Adresse IP";"Navigateur"'
+echo '"Date";"Action";"Status";"login PC";"Reference Document";"VIN";"Adresse IP";"Navigateur"'
 
 sort \
     --numeric-sort \
