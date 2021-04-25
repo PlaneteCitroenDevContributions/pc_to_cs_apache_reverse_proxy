@@ -149,7 +149,7 @@ generateStatisticEntry ()
     (
 	# use date since epoch to easy line sorting later
         local stat_date=$( date '+%s' )
-        echo "\"${stat_date}\" \"${param}\" \"${action}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
+        echo "\"${stat_date}\" \"${action}\" \"${param}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
     ) > "${stat_file}"
 }
 
