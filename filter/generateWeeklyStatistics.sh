@@ -88,14 +88,30 @@ generateCSVStatLine ()
     eval declare -a tab=( "${protected_line}" )
 
     epoch_time=${tab[0]}
-    pc_login=${tab[1]}
-    reason=${tab[2]}
+    action=${tab[1]}
+    param=${tab[1]}
     status=${tab[3]}
     real_ip=${tab[4]}
     user_agent=${tab[5]}
 
+    case "${action}" in
+
+	"login" )
+	    pc_login="${param}"
+	    ;;
+
+	"documentation" )
+	    doc_ref="${param}"
+	    ;;
+
+	*)
+	    echo "ERROR: bas action ${action}" 1>&2
+	    ;;
+    esac
+      
+
     csv_date=$( date --date "@${epoch_time}" '+%x %T' )
-    echo "\"${csv_date}\";\"${pc_login}\";\"${reason}\";\"${status}\";\"${real_ip}\";\"${user_agent}\""
+    echo "\"${csv_date}\";\"${action}\";\"${status}\";\"${pc_login}\";\"${doc_ref}\";\"${real_ip}\";\"${user_agent}\""
 
 }
 
@@ -103,7 +119,7 @@ generateCSVStatLine ()
 # generate CSV file
 #
 
-echo '"Date";"login PC";"Action";"Status";"Adresse IP";"Navigateur"'
+echo '"Date";"Action";"Status";"login PC";"Adresse IP";"Navigateur"'
 
 sort \
     --numeric-sort \
