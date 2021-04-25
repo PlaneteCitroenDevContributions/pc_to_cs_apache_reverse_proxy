@@ -128,8 +128,8 @@ mkdir -p "${STAT_DATA_DIR}"
 
 generateStatisticEntry ()
 {
-    local reason="$1"
-    local userid="$2"
+    local action="$1"
+    local param="$2"
     local status="$3"
 
     local current_year=$( date '+%Y' )
@@ -149,7 +149,7 @@ generateStatisticEntry ()
     (
 	# use date since epoch to easy line sorting later
         local stat_date=$( date '+%s' )
-        echo "\"${stat_date}\" \"${userid}\" \"${reason}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
+        echo "\"${stat_date}\" \"${param}\" \"${action}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
     ) > "${stat_file}"
 }
 
@@ -227,6 +227,16 @@ case "${REQUEST_URI}" in
 	    generateStatisticEntry login "${userid}" fail
 	fi
 
+	;;
+
+    /docapvAC/affiche.do* )
+	#
+	# user has selected a document
+	#
+	document_reference_query_field=$( echo "${QUERY_STRING}" | cut -d \& -f 1 )
+	document_reference="${document_reference_query_field#ref=}"
+        generateStatisticEntry documentation "${document_reference}" "none"
+	cp "${in_file}" "${corrected_in_file}"
 	;;
 
     * )
