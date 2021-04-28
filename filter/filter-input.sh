@@ -244,7 +244,7 @@ case "${REQUEST_URI}" in
 	#
 	# user has selected a document
 	#
-	jvin_field_in_body=$( sed -e '/VIN_OK_BUTTON/s/.*jvin=\([^\&]*\).*/\1/' )
+	jvin_field_in_body=$( sed -e '/VIN_OK_BUTTON/s/.*jvin=\([^\&]*\).*/\1/' "${in_file}" )
 	if [[ -n "${jvin_field_in_body}" ]]
 	then
             generateStatisticEntry vin "${jvin_field_in_body}" "none"
