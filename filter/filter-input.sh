@@ -236,6 +236,20 @@ case "${REQUEST_URI}" in
 	document_reference_query_field=$( echo "${QUERY_STRING}" | cut -d \& -f 1 )
 	document_reference="${document_reference_query_field#ref=}"
         generateStatisticEntry documentation "${document_reference}" "none"
+
+	cp "${in_file}" "${corrected_in_file}"
+	;;
+
+    "/do/ok" )
+	#
+	# user has selected a document
+	#
+	jvin_field_in_body=$( sed -e '/VIN_OK_BUTTON/s/.*jvin=\([^\&]*\).*/\1/' )
+	if [[ -n "${jvin_field_in_body}" ]]
+	then
+            generateStatisticEntry vin "${jvin_field_in_body}" "none"
+	fi
+
 	cp "${in_file}" "${corrected_in_file}"
 	;;
 
