@@ -222,9 +222,9 @@ case "${REQUEST_URI}" in
 
 	if ${pc_login_success}
 	then
-	    generateStatisticEntry login "${userid}" success
+	    generateStatisticEntry "login" "${userid}" success
 	else
-	    generateStatisticEntry login "${userid}" fail
+	    generateStatisticEntry "login" "${userid}" fail
 	fi
 
 	;;
@@ -235,7 +235,7 @@ case "${REQUEST_URI}" in
 	#
 	document_reference_query_field=$( echo "${QUERY_STRING}" | cut -d \& -f 1 )
 	document_reference="${document_reference_query_field#ref=}"
-        generateStatisticEntry documentation "${document_reference}" "none"
+        generateStatisticEntry "documentation" "${document_reference}" "none"
 
 	cp "${in_file}" "${corrected_in_file}"
 	;;
@@ -247,7 +247,7 @@ case "${REQUEST_URI}" in
 	jvin_field_in_body=$( sed -e '/VIN_OK_BUTTON/s/.*jvin=\([^\&]*\).*/\1/' "${in_file}" )
 	if [[ -n "${jvin_field_in_body}" ]]
 	then
-            generateStatisticEntry vin "${jvin_field_in_body}" "none"
+            generateStatisticEntry "vin" "${jvin_field_in_body}" "none"
 	fi
 
 	cp "${in_file}" "${corrected_in_file}"
