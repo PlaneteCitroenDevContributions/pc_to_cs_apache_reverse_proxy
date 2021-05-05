@@ -12,7 +12,8 @@ Usage ()
     msg="$@"
     (
 	echo "ERROR: ${msg}"
-	echo "Usage ${PGM_BASENAME} <week number of current year>"
+	echo "Usage ${PGM_BASENAME} [-w <week number>|--week=<week number>]"
+	echo "	If week number is a negative integer, specifies a relative week number to current week number"
     ) 1>&2
 }
 
