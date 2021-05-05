@@ -18,13 +18,26 @@ Usage ()
 }
 
 
-if [[ $# != 1 ]]
-then
-    Usage "bad args"
-    exit 1
+PARSED_ARGUMENTS=$( getopt --options -o w: --longoptions week: -- "$@" )
+
+VALID_ARGUMENTS=$?
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  Usage "bad arg"
 fi
 
-week_number="$1"
+for a in ${PARSED_ARGUMENTS}
+do
+    case "${a}" in
+	-w | --week )
+	    shift
+	    week_number="$1"
+	    ;;
+	* )
+	    echo "Error in argument parsing" 1>&2
+	    exit 1
+	    ;;
+    esac
+done
 
 if expr "${week_number}" + 0 1>/dev/null 2>/dev/null
 then
@@ -33,6 +46,8 @@ else
     Usage "argument should be an integer"
     exit 1
 fi
+
+# TODO: if week number is negative, compute real week number
 
 if [[ 1 -le ${week_number} && ${week_number} -le 53 ]]
 then
