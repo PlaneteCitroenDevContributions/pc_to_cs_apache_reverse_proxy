@@ -15,14 +15,16 @@ Usage ()
 	echo "Usage ${PGM_BASENAME} [-w <week number>|--week=<week number>]"
 	echo "	If week number is a negative integer, specifies a relative week number to current week number"
     ) 1>&2
+    exit 1
 }
 
 
-PARSED_ARGUMENTS=$( getopt --options -o w: --longoptions week: -- "$@" )
+PARSED_ARGUMENTS=$( getopt --options 'w:' --longoptions 'week:' -- "$@" )
 
 VALID_ARGUMENTS=$?
-if [ "$VALID_ARGUMENTS" != "0" ]; then
-  Usage "bad arg"
+if [ "$VALID_ARGUMENTS" == "0" ]; then
+    Usage "bad arg: $@"
+    #NOT REACHED
 fi
 
 for a in ${PARSED_ARGUMENTS}
