@@ -35,7 +35,7 @@ do
 	    week_number="$1"
 	    ;;
 	* )
-	    echo "Error in argument parsing" 1>&2
+	    echo "Internal error getopt config" 1>&2
 	    exit 1
 	    ;;
     esac
@@ -46,7 +46,7 @@ then
     :
 else
     Usage "argument should be an integer"
-    exit 1
+    #NOT REACHED
 fi
 
 # TODO: if week number is negative, compute real week number
@@ -56,7 +56,7 @@ then
     :
 else
     Usage "argument should be a valide week number"
-    exit 1
+    #NOT REACHED
 fi
 
 : ${STATS_FOR_YEAR:=$( date '+%Y' )}
@@ -73,6 +73,7 @@ then
 else
     Usage "could not acces stat folder \"${STAT_DATA_DIR}\""
     exit 1
+    #NOT REACHED
 fi
 
 #
