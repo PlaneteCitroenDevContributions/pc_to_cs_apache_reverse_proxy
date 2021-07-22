@@ -12,34 +12,39 @@ Usage ()
     msg="$@"
     (
 	echo "ERROR: ${msg}"
-	echo "Usage ${PGM_BASENAME} [-w <week number>|--week=<week number>]"
+	echo "Usage ${PGM_BASENAME} [-w|--week <week number>]"
 	echo "	If week number is a negative integer, specifies a relative week number to current week number"
     ) 1>&2
     exit 1
 }
 
 
-PARSED_ARGUMENTS=$( getopt --options 'w:' --longoptions 'week:' -- "$@" )
-
-VALID_ARGUMENTS=$?
-if [ "$VALID_ARGUMENTS" == "0" ]; then
-    Usage "bad arg: $@"
-    #NOT REACHED
-fi
-
-for a in ${PARSED_ARGUMENTS}
+while [[ -n "$1" ]]
 do
-    case "${a}" in
+     case "$1" in
 	-w | --week )
 	    shift
 	    week_number="$1"
 	    ;;
 	* )
-	    echo "Internal error getopt config" 1>&2
+	    Usage "bad arg: $1"
 	    exit 1
 	    ;;
     esac
 done
+
+#
+# check if any mandatory arg has been provided
+#
+if [[ -z "${week_number}" ]]
+then
+    Usage "missing args"
+    exit 1
+fi
+
+#
+# check arg consistency
+#
 
 if expr "${week_number}" + 0 1>/dev/null 2>/dev/null
 then
