@@ -24,19 +24,20 @@ do
      case "$1" in
 	-w | --week )
 	    shift
-	    week_number="$1"
+	    week_number_arg="$1"
 	    ;;
 	* )
 	    Usage "bad arg: $1"
 	    exit 1
 	    ;;
-    esac
+     esac
+     shift
 done
 
 #
 # check if any mandatory arg has been provided
 #
-if [[ -z "${week_number}" ]]
+if [[ -z "${week_number_arg}" ]]
 then
     Usage "missing args"
     exit 1
@@ -46,22 +47,35 @@ fi
 # check arg consistency
 #
 
-if expr "${week_number}" + 0 1>/dev/null 2>/dev/null
+if expr "${week_number_arg}" + 0 1>/dev/null 2>/dev/null
 then
     :
 else
-    Usage "argument should be an integer"
+    Usage "week number argument should be an integer"
     #NOT REACHED
 fi
 
 # TODO: if week number is negative, compute real week number
 
-if [[ 1 -le ${week_number} && ${week_number} -le 53 ]]
+if [[ ${week_number_arg} -lt 0 ]]
 then
-    :
+    # compute a relative week number
+    current_week_number=$( date '+%U' )
+    abs_week_number=$(( ${current_week_number} - ${week_number_arg} ))
+    if [[ ${abs_week_number} -lt 0 ]]
+    then
+	Usage "relative week number ${week_number_arg} is too large"
+	#NOT REACHED
+    fi
 else
-    Usage "argument should be a valide week number"
-    #NOT REACHED
+    # its an absolute week number in [0..52]
+    if [[ ${week_number_arg} -le 52 ]]
+    then
+	week_number=${week_number_arg}
+    else
+	Usage "week number should be in range [0..52]"
+	#NOT REACHED
+    fi
 fi
 
 : ${STATS_FOR_YEAR:=$( date '+%Y' )}
