@@ -134,6 +134,10 @@ generateCSVStatLine ()
     real_ip=${tab[4]}
     user_agent=${tab[5]}
 
+    pc_login=''
+    doc_ref=''
+    vin=''
+
     case "${action}" in
 
 	"login" )
