@@ -159,7 +159,7 @@ generateCSVStatLine ()
     esac
       
 
-    csv_date=$( date --date "@${epoch_time}" '+%x %T' )
+    csv_date=$( date --date "@${epoch_time}" '+%d/%m/%Y %T' )
     echo "\"${csv_date}\";\"${action}\";\"${status}\";\"${pc_login}\";\"${doc_ref}\";\"${vin}\";\"${real_ip}\";\"${user_agent}\""
 
 }
