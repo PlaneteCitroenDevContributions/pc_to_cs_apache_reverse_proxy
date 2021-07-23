@@ -129,7 +129,7 @@ generateCSVStatLine ()
 
     epoch_time=${tab[0]}
     action=${tab[1]}
-    param=${tab[1]}
+    param=${tab[2]}
     status=${tab[3]}
     real_ip=${tab[4]}
     user_agent=${tab[5]}
@@ -156,7 +156,7 @@ generateCSVStatLine ()
       
 
     csv_date=$( date --date "@${epoch_time}" '+%x %T' )
-    echo "\"${csv_date}\";\"${action}\";\"${status}\";\"${pc_login}\";\"${doc_ref}\";\"${VIN}\";\"${real_ip}\";\"${user_agent}\""
+    echo "\"${csv_date}\";\"${action}\";\"${status}\";\"${pc_login}\";\"${doc_ref}\";\"${vin}\";\"${real_ip}\";\"${user_agent}\""
 
 }
 
