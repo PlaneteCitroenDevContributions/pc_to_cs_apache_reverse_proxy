@@ -8,9 +8,10 @@ services:
      build: .
      image: pcrproxy:latest
      environment:
-        - STAT_DATA_DIR="/var/pc_stats"
+        - STAT_DATA_DIR=/var/pc_stats
         - TZ=Europe/Paris
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
+        - FILTER_DEBUG=yes
 
      volumes:
         - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
