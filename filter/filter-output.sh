@@ -4,29 +4,39 @@
 
 HERE=$( dirname "$0" )
 
-: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
-_debug_dir_="${DEBUG_ROOT_DIR}/debug_response_$$"
-mkdir -m 777 -p "${_debug_dir_}"
+if [[ -n "${FILTER_DEBUG}" ]]
+then
+    set -x
+    if [[ "${FILTER_DEBUG}" == "file" ]]
+    then
+	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
+	_debug_dir_="${DEBUG_ROOT_DIR}/debug_request_$$"
+	mkdir -m 777 -p "${_debug_dir_}"
 
-: ${log_file:="${_debug_dir_}/logs.txt"}
+	: ${STDERR:="${_debug_dir_}/stderr.txt"}
+	: ${trace_file:="${_debug_dir_}/trace.txt"}
 
-: ${STDERR:="${_debug_dir_}/filter-output_stderr.txt"}
-exec 2>>"${STDERR}"
+	exec 2>>"${STDERR}"
+    fi
+fi
 
 response_file="/tmp/response.txt.$$"
 corrected_response_file="/tmp/corrected_response.txt.$$"
 
 cat - > "${response_file}"
 
-(
-    echo '======================================================'
-    date
-    echo '------------------------------------------------------'
-    export
-    echo '======================================================'
-    echo -n "ORIGINAL RESPONSE:"
-    cat "${response_file}"
-) >> "${log_file}"
+if [[ -n "${trace_file}" ]]
+then
+    (
+	echo '======================================================'
+	date
+	echo '------------------------------------------------------'
+	export
+	echo '======================================================'
+	echo -n "ORIGINAL RESPONSE:"
+	cat "${response_file}"
+    ) >> "${trace_file}"
+fi
 
 
 case "${REQUEST_URI}" in
@@ -41,12 +51,15 @@ case "${REQUEST_URI}" in
 	;;
 esac
 
-(
-    echo '++++++++++++++++++++++++++++++++++++>'
-    echo -n "CORRECTED RESPONSE:"
-    cat "${corrected_response_file}"
-    echo '^^^^^^^^^^^^^^^^^^^^^^^^'
-) >> "${log_file}"
+if [[ -n "${trace_file}" ]]
+then
+    (
+	echo '++++++++++++++++++++++++++++++++++++>'
+	echo -n "CORRECTED RESPONSE:"
+	cat "${corrected_response_file}"
+	echo '^^^^^^^^^^^^^^^^^^^^^^^^'
+    ) >> "${trace_file}"
+fi
 
 cat "${corrected_response_file}"
 
