@@ -5,7 +5,8 @@ version: '3'
 services:
 
   reverse-proxy-to-cs:
-     image: pcrproxy
+     build: .
+     image: pcrproxy:latest
      environment:
         - STAT_DATA_DIR="/var/pc_stats"
         - TZ=Europe/Paris
@@ -20,7 +21,9 @@ services:
 volumes:
 
    NEXTCLOUD_EXTERNAL_STORAGE1:
-      name: VOL4NEXTCLOUD_EXTERNAL_STORAGE
+      external:
+         name: VOL4NEXTCLOUD_EXTERNAL_STORAGE
 
    RPROXY_CONFIG:
-      name: VOL4NEXTCLOUD_RPROXY_CONFIG
+      external:
+         name: VOL4NEXTCLOUD_RPROXY_CONFIG
