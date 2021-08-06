@@ -14,6 +14,8 @@ then
 	mkdir -m 777 -p "${_debug_dir_}"
 
 	: ${STDERR:="${_debug_dir_}/stderr.txt"}
+	: ${trace_file:="${_debug_dir_}/trace.txt"}
+
 	exec 2>>"${STDERR}"
     fi
 fi
@@ -25,8 +27,6 @@ fi
 
 in_file="/tmp/in.txt.$$"
 corrected_in_file="/tmp/corrected_in.txt.$$"
-
-: ${trace_file:="${_debug_dir_}/trace.txt"}
 
 : ${check_pc_user_pgm:="${HERE}/checkVBulletinUser.sh"}
 
@@ -169,15 +169,19 @@ generateStatisticEntry ()
 # =====
 #
 
-(
-    echo 'vvvvvvvvvvvvvvvvvvvvvvv'
-    date
-    export
-    echo -n '===========================================>'
-    cat "${in_file}"
-    echo '<==========================================='
-    echo '-----------------------'
-) >> "${trace_file}"
+if [[ -n "${trace_file}" ]]
+then
+
+    (
+	echo 'vvvvvvvvvvvvvvvvvvvvvvv'
+	date
+	export
+	echo -n '===========================================>'
+	cat "${in_file}"
+	echo '<==========================================='
+	echo '-----------------------'
+    ) >> "${trace_file}"
+fi
 
 #
 # MAIN
@@ -269,18 +273,21 @@ case "${REQUEST_URI}" in
 	;;
 esac
 
-(
-    echo -n '++++++++++++++++++++++++++++++++++++>'
-    cat "${corrected_in_file}"
-    echo '<++++++++++++++++++++++++++++++++++++'
-    echo "Got username: ${username}"
-    echo "Used elapseTimeUserName: ${elapseTimeUserName}"
-    echo "Got userid: ${userid}"
-    echo "Used loginUserid: ${loginUserid}"
-    echo "Got password: ${password}"
-    echo "Used loginPassword: ${loginPassword}"
-    echo '^^^^^^^^^^^^^^^^^^^^^^^^'
-) >> "${trace_file}"
+if [[ -n "${trace_file}" ]]
+then
+    (
+	echo -n '++++++++++++++++++++++++++++++++++++>'
+	cat "${corrected_in_file}"
+	echo '<++++++++++++++++++++++++++++++++++++'
+	echo "Got username: ${username}"
+	echo "Used elapseTimeUserName: ${elapseTimeUserName}"
+	echo "Got userid: ${userid}"
+	echo "Used loginUserid: ${loginUserid}"
+	echo "Got password: ${password}"
+	echo "Used loginPassword: ${loginPassword}"
+	echo '^^^^^^^^^^^^^^^^^^^^^^^^'
+    ) >> "${trace_file}"
+fi
 
 cat "${corrected_in_file}"
 
