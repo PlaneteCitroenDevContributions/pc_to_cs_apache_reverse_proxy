@@ -9,7 +9,18 @@ services:
      environment:
         - STAT_DATA_DIR="/var/pc_stats"
         - TZ=Europe/Paris
+        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
+
      volumes:
         - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
         - ./filter/:/filter/
         - ./pc_stats/:/var/pc_stats/
+        - RPROXY_CONFIG:/etc/pcrproxy/
+
+volumes:
+
+   NEXTCLOUD_EXTERNAL_STORAGE1:
+      name: VOL4NEXTCLOUD_EXTERNAL_STORAGE
+
+   RPROXY_CONFIG:
+      name: VOL4NEXTCLOUD_RPROXY_CONFIG
