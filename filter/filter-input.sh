@@ -4,12 +4,27 @@ HERE=$( dirname "$0" )
 PGM_BASENAME=$( basename "$0" )
 ENV_FILE="${HERE}/env-${PGM_BASENAME}"
 
-: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
-_debug_dir_="${DEBUG_ROOT_DIR}/debug_request_$$"
-mkdir -m 777 -p "${_debug_dir_}"
+if [[ -n "${FILTER_DEBUG}" ]]
+then
+    set -x
+    if [[ "${FILTER_DEBUG}" == "file" ]]
+    then
+	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
+	_debug_dir_="${DEBUG_ROOT_DIR}/debug_request_$$"
+	mkdir -m 777 -p "${_debug_dir_}"
 
-: ${STDERR:="${_debug_dir_}/stderr.txt"}
-exec 2>>"${STDERR}"
+	: ${STDERR:="${_debug_dir_}/stderr.txt"}
+	exec 2>>"${STDERR}"
+    fi
+fi
+
+set -x
+export
+echo $VAR2
+echo $TOTO
+echo "CREDENTIAL_FILE: $CREDENTIAL_FILE"
+env
+echo "$@"
 
 if [[ -x "${ENV_FILE}" ]]
 then
