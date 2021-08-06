@@ -18,14 +18,6 @@ then
     fi
 fi
 
-set -x
-export
-echo $VAR2
-echo $TOTO
-echo "CREDENTIAL_FILE: $CREDENTIAL_FILE"
-env
-echo "$@"
-
 if [[ -x "${ENV_FILE}" ]]
 then
     source "${ENV_FILE}"
