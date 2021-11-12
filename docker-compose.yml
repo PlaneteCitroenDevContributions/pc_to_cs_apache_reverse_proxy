@@ -11,7 +11,7 @@ services:
         - STAT_DATA_DIR=/var/pc_stats
         - TZ=Europe/Paris
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
-        - FILTER_DEBUG=yes
+        - FILTER_DEBUG=file
 
      volumes:
         - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
