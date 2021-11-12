@@ -291,5 +291,9 @@ fi
 
 cat "${corrected_in_file}"
 
-cp "${in_file}" "${corrected_in_file}" "${_debug_dir_}"
+if [[ -n "${_debug_dir_}" ]]
+then
+    cp "${in_file}" "${corrected_in_file}" "${_debug_dir_}"
+fi
+
 rm -f "${in_file}" "${corrected_in_file}"
