@@ -14,9 +14,21 @@ then
 	mkdir -m 777 -p "${_debug_dir_}"
 
 	: ${STDERR:="${_debug_dir_}/stderr.txt"}
-	: ${trace_file:="${_debug_dir_}/trace.txt"}
-
+	if echo '' >> "${STDERR}"
+	then
+	    :
+	else
+	    STDERR=/dev/stderr
+	fi
 	exec 2>>"${STDERR}"
+	
+	: ${trace_file:="${_debug_dir_}/trace.txt"}
+	if echo '' >> "${trace_file}"
+	then
+	    :
+	else
+	    trace_file="/dev/stderr"
+	fi
     fi
 fi
 
