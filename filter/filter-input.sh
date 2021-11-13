@@ -18,6 +18,8 @@ then
 	then
 	    :
 	else
+	    # invalidate _debug_dir_
+	    _debug_dir_=''
 	    STDERR=/dev/stderr
 	fi
 	exec 2>>"${STDERR}"
@@ -27,6 +29,8 @@ then
 	then
 	    :
 	else
+	    # invalidate _debug_dir_
+	    _debug_dir_=''
 	    trace_file="/dev/stderr"
 	fi
     fi
