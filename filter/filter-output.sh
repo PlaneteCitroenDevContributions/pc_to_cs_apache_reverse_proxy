@@ -26,6 +26,7 @@ then
 	    _debug_dir_=''
 	    STDERR=/dev/stderr
 	fi
+	echo "Redirect stderr to ${STDERR}" 1>&2
 	exec 2>>"${STDERR}"
 	
 	: ${trace_file:="${_debug_dir_}/trace.txt"}
