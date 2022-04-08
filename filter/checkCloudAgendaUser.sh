@@ -40,32 +40,6 @@ then
 fi
 
 #
-# TMP management
-#
-: ${SKIP_CLEAN_TMP:=""}
-if [[ -n "${SKIP_CLEAN_TMP}" ]]
-then
-    _skip_clean_tmp=true
-else
-    _skip_clean_tmp=false
-fi
-
-: ${TMP_PREFIX:=$( mktemp -u )}
-trap "cleanup" 0
-
-
-cleanup ()
-{
-    if ${_skip_clean_tmp}
-    then
-	return 0
-    fi
-
-    rm -rf \
-       "${TMP_PREFIX}"
-}
-
-#
 # check if user has access to a specific message
 #
 
