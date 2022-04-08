@@ -66,17 +66,21 @@ cleanup ()
 
 checkUserHasAccessToPC ()
 {
-    local pc_username="$1"
-    local pc_password="$2"
+    local pc_cloud_username="$1"
+    local pc_cloud_password="$2"
 
-    if [[ -z "${pc_username}" || -z "${pc_password}" ]]
+    if [[ -z "${pc_cloud_username}" || -z "${pc_cloud_password}" ]]
     then
 	echo "ERROR: missing username or password" 1>&2
 	return 1
     fi
 
+    local dn="uid=${pc_cloud_username},ou=people,dc=planetecitroen,dc=fr"
+    ldapwhoami -H "ldap://ldap:3389" -D "${dn}" -w "${pc_cloud_password}"
+    ldap_status=$?
+
     local access_granted=false
-    if [[ -n "${found_mandatory_keywords}" ]]
+    if [[ "${ldap_status}" -eq 0 ]]
     then
 	access_granted=true
     fi
