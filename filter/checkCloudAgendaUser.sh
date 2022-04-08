@@ -94,7 +94,7 @@ checkUserHasAccessToPC ()
 		   dn
 	    )
 
-	if [[ -n "${ldap_search_result}" -eq 0 ]]
+	if [[ -n "${ldap_search_result}" ]]
 	then
 	    access_granted=true
 	fi
