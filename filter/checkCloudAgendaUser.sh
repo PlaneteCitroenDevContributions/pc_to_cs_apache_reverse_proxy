@@ -1,6 +1,11 @@
 #! /bin/bash
 
 #
+# configuration vars
+#
+: ${PC_LDAP_URL:="ldap://ldap:3389"}
+
+#
 # check args
 #
 
@@ -76,7 +81,7 @@ checkUserHasAccessToPC ()
     fi
 
     local dn="uid=${pc_cloud_username},ou=people,dc=planetecitroen,dc=fr"
-    ldapwhoami -H "ldap://ldap:3389" -D "${dn}" -w "${pc_cloud_password}"
+    ldapwhoami -H "${PC_LDAP_URL}" -D "${dn}" -w "${pc_cloud_password}"
     ldap_status=$?
 
     local access_granted=false
