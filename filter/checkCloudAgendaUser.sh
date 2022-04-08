@@ -87,7 +87,17 @@ checkUserHasAccessToPC ()
     local access_granted=false
     if [[ "${ldap_status}" -eq 0 ]]
     then
-	access_granted=true
+
+	ldap_search_result=$(
+	    ldapsearch -LLL -x -H "${PC_LDAP_URL}" -b "${dn}" \
+		   '(&(memberOf=cn=ServiceBoxUser,ou=groups,dc=planetecitroen,dc=fr)(memberOf=cn=ServiceBoxAllowed,ou=groups,dc=planetecitroen,dc=fr))' \
+		   dn
+	    )
+
+	if [[ -n "${ldap_search_result}" -eq 0 ]]
+	then
+	    access_granted=true
+	fi
     fi
 
     if ${access_granted}
