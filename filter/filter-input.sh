@@ -45,7 +45,7 @@ fi
 in_file="/tmp/in.txt.$$"
 corrected_in_file="/tmp/corrected_in.txt.$$"
 
-: ${check_pc_user_pgm:="${HERE}/checkVBulletinUser.sh"}
+: ${check_pc_user_pgm:="${HERE}/checkCloudAgendaUser.sh"}
 
 #
 # get cs credentials from credential file
