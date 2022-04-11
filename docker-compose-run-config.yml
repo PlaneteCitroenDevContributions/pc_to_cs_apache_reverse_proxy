@@ -11,7 +11,7 @@ services:
      environment:
         - VIRTUAL_HOST=csdepc.forumtestplanetecitroen.fr
         - LETSENCRYPT_HOST=csdepc.forumtestplanetecitroen.fr
-        - VIRTUAL_PORT=8888
+        - VIRTUAL_PORT=80
      networks:
         - auto_https_reverse_proxy
         - internal_services
