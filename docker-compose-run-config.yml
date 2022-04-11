@@ -14,7 +14,7 @@ services:
         - VIRTUAL_PORT=8888
      networks:
         - auto_https_reverse_proxy
-        - internal_services:
+        - internal_services
 
 networks:
    auto_https_reverse_proxy:
