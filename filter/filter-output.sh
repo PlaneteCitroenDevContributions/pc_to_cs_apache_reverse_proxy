@@ -14,7 +14,7 @@ then
     if [[ "${FILTER_DEBUG}" == "file" ]]
     then
 	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
-	_debug_dir_="${DEBUG_ROOT_DIR}/debug_request_$( date '+%s' )"
+	_debug_dir_="${DEBUG_ROOT_DIR}/debug_response_$( date '+%s' )"
 	mkdir -m 777 -p "${_debug_dir_}"
 
 	: ${STDERR:="${_debug_dir_}/stderr.txt"}
