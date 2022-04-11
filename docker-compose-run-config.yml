@@ -9,14 +9,18 @@ services:
      ports:
         - 8888:80
      environment:
-        - VIRTUAL_HOST=csdepc.planete-citroen.com
+        - VIRTUAL_HOST=csdepc.forumtestplanetecitroen.fr
+        - LETSENCRYPT_HOST=csdepc.forumtestplanetecitroen.fr
         - VIRTUAL_PORT=8888
-        - LETSENCRYPT_HOST=csdepc.planete-citroen.com
-        - LETSENCRYPT_EMAIL=raphael.bernhard@orange.fr
      networks:
         - auto_https_reverse_proxy
+        - internal_services:
 
 networks:
-  auto_https_reverse_proxy:
-     external:
-        name: webservices
+   auto_https_reverse_proxy:
+      external:
+         name: revproxy
+
+   internal_services:
+      external:
+         name: internal_services
