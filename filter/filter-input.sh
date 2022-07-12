@@ -119,30 +119,31 @@ checkUserpassword ()
 
     check_result=false
 
-    case "${username}" in
+    if [[ -n "${_CREDENTIONAL_DEBUG_}" ]]
+    then
+	case "${username}" in
 
-	# FIXME: to remove
-	"pc1" )
-	    if [[ "${password}" == "pc1pass" ]]
-	    then
-		return 0
-	    fi
-	;;
-	"pc2")
-	    if [[ "${password}" == "pc2pass" ]]
-	    then
-		return 0
-	    fi
-	    ;;
-	*)
-	    if "${check_pc_user_pgm}" "${username}" "${password}"
-	    then
-		return 0
-	    else
-		return 1
-	    fi
-	    ;;
-    esac
+	    "pc1" )
+		if [[ "${password}" == "pc1pass" ]]
+		then
+		    return 0
+		fi
+		;;
+	    "pc2")
+		if [[ "${password}" == "pc2pass" ]]
+		then
+		    return 0
+		fi
+		;;
+	esac
+    fi
+
+    if "${check_pc_user_pgm}" "${username}" "${password}"
+    then
+	return 0
+    else
+	return 1
+    fi
 
 }
 
