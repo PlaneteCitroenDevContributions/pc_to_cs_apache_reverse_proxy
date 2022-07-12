@@ -21,9 +21,9 @@ services:
 volumes:
 
    NEXTCLOUD_EXTERNAL_STORAGE1:
-      external:
-         name: VOL4NEXTCLOUD_EXTERNAL_STORAGE
+      external: true
+      name: VOL4NEXTCLOUD_EXTERNAL_STORAGE
 
    RPROXY_CONFIG:
-      external:
-         name: VOL4NEXTCLOUD_RPROXY_CONFIG
+      external: true
+      name: VOL4NEXTCLOUD_RPROXY_CONFIG

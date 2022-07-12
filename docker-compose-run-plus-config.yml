@@ -4,7 +4,7 @@ version: '3'
 
 services:
 
-  reverse-proxy-to-cs-plus:
+  reverse-proxy-to-cs:
      restart: unless-stopped
      ports:
         - 8889:80
@@ -19,9 +19,9 @@ services:
 
 networks:
    auto_https_reverse_proxy:
-      external:
-         name: revproxy
+      external: true
+      name: revproxy
 
    internal_services:
-      external:
-         name: internal_services
+      external: true
+      name: internal_services
