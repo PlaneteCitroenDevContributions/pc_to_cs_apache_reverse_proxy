@@ -9,6 +9,7 @@ services:
      ports:
         - 8889:80
      environment:
+        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential-plus.txt
         - VIRTUAL_HOST=csdepc-plus.forumtestplanetecitroen.fr
         - LETSENCRYPT_HOST=csdepc-plus.forumtestplanetecitroen.fr
         - VIRTUAL_PORT=8889
