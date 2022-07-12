@@ -57,12 +57,17 @@ credential_file_effective_content=$(
 
 : ${CREDENTIAL_FILE:="${HERE}/cs_credential.txt"}
 cs_login=$(
-    grep cs_login <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+    grep 'cs_login' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
 )
 
 cs_password=$(
-    grep cs_password <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+    grep 'cs_password' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
 	   )
+
+# TODO:
+# - add ldap group filter
+# - better filter for value: echo "${x}" | sed -e 's/^\ *//' -e 's/ *$//'
+
 
 if [[ -z "${cs_login}" ]]
 then
