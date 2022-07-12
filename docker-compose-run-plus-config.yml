@@ -1,0 +1,26 @@
+# -*- mode: indented-text; tab-width: 3; indent-tabs-mode: nil -*-
+
+version: '3'
+
+services:
+
+  reverse-proxy-to-cs:
+     restart: unless-stopped
+     ports:
+        - 8888:80
+     environment:
+        - VIRTUAL_HOST=csdepc.forumtestplanetecitroen.fr
+        - LETSENCRYPT_HOST=csdepc.forumtestplanetecitroen.fr
+        - VIRTUAL_PORT=80
+     networks:
+        - auto_https_reverse_proxy
+        - internal_services
+
+networks:
+   auto_https_reverse_proxy:
+      external:
+         name: revproxy
+
+   internal_services:
+      external:
+         name: internal_services
