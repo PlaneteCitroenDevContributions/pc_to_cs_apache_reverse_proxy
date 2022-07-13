@@ -13,7 +13,7 @@ _DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_='(&(memberOf=cn=ServiceBoxU
 
 usage ()
 {
-    echo "Usage: $0 <cloud login> <cloud password> [ldap group membership search expression]
+    echo "Usage: $0 <cloud login> <cloud password> [group1cn group2cn ...]
 	Default value for ldap group expression: ${_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_}" 1>&2
     exit 1
 }
