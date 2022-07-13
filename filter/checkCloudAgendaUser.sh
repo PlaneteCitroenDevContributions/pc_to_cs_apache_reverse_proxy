@@ -6,7 +6,7 @@
 _DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_='(&(memberOf=cn=ServiceBoxUser,ou=groups,dc=planetecitroen,dc=fr)(memberOf=cn=ServiceBoxAllowed,ou=groups,dc=planetecitroen,dc=fr))'
 
 : ${PC_LDAP_URL:="ldap://ldap:3389"}
-_group_membership_search_expression=${_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_}
+group_membership_ldap_search_expression=${_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_}
 
 #
 # check args
@@ -20,14 +20,9 @@ usage ()
 }
 
 
-if [[ $# -ne 2 ]]
-then
-    usage
-    # not reached
-fi
-
 username="$1"
 password="$2"
+ldap_search_expression="$3"
 
 if [[ -z "${username}" ]]
 then
@@ -43,6 +38,11 @@ then
     # not reached
 fi
 
+if [[ -n "${ldap_search_expression}" ]]
+then
+    group_membership_ldap_search_expression=${ldap_search_expression}
+fi
+
 #
 # check if user has access to a specific message
 #
@@ -51,6 +51,7 @@ checkUserHasAccessToPC ()
 {
     local pc_cloud_username="$1"
     local pc_cloud_password="$2"
+    local ldap_filter_search_expression="$3"
 
     if [[ -z "${pc_cloud_username}" || -z "${pc_cloud_password}" ]]
     then
@@ -67,9 +68,7 @@ checkUserHasAccessToPC ()
     then
 
 	ldap_search_result=$(
-	    ldapsearch -LLL -x -H "${PC_LDAP_URL}" -b "${dn}" \
-		   '(&(memberOf=cn=ServiceBoxUser,ou=groups,dc=planetecitroen,dc=fr)(memberOf=cn=ServiceBoxAllowed,ou=groups,dc=planetecitroen,dc=fr))' \
-		   dn
+	    ldapsearch -LLL -x -H "${PC_LDAP_URL}" -b "${dn}" "${ldap_filter_search_expression}" dn
 	    )
 
 	if [[ -n "${ldap_search_result}" ]]
@@ -86,4 +85,4 @@ checkUserHasAccessToPC ()
     fi
 }
 
-checkUserHasAccessToPC "${username}" "${password}"
+checkUserHasAccessToPC "${username}" "${password}" "(${group_membership_ldap_search_expression})"
