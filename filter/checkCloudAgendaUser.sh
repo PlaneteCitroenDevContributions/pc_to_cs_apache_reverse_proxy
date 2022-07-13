@@ -6,7 +6,6 @@
 _DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_='(&(memberOf=cn=ServiceBoxUser,ou=groups,dc=planetecitroen,dc=fr)(memberOf=cn=ServiceBoxAllowed,ou=groups,dc=planetecitroen,dc=fr))'
 
 : ${PC_LDAP_URL:="ldap://ldap:3389"}
-group_membership_ldap_search_expression=${_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_}
 
 #
 # check args
@@ -22,7 +21,6 @@ usage ()
 
 username="$1"
 password="$2"
-ldap_search_expression="$3"
 
 if [[ -z "${username}" ]]
 then
@@ -38,9 +36,30 @@ then
     # not reached
 fi
 
-if [[ -n "${ldap_search_expression}" ]]
+shift 2
+
+groups_membership_args="$@"
+
+buildGroupMembershipLdapSearchFilter ()
+{
+    local group_list="$@"
+
+    ldap_group_filter=$(
+	echo -n '(&'
+	for g in ${group_list}
+	do
+	    echo -n '(memberOf=cn='${g}',ou=groups,dc=planetecitroen,dc=fr)'
+	done
+	echo -n ')'
+	)
+    echo "${ldap_group_filter}"
+}
+
+if [[ -z "${groups_membership_args}" ]]
 then
-    group_membership_ldap_search_expression=${ldap_search_expression}
+    group_membership_ldap_search_expression=${_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_}
+else
+    group_membership_ldap_search_expression=$( buildGroupMembershipLdapSearchFilter ${groups_membership_args} )
 fi
 
 #
@@ -85,4 +104,4 @@ checkUserHasAccessToPC ()
     fi
 }
 
-checkUserHasAccessToPC "${username}" "${password}" "(${group_membership_ldap_search_expression})"
+checkUserHasAccessToPC "${username}" "${password}" "${group_membership_ldap_search_expression}"
