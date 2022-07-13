@@ -3,7 +3,10 @@
 #
 # configuration vars
 #
+_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_='(&(memberOf=cn=ServiceBoxUser,ou=groups,dc=planetecitroen,dc=fr)(memberOf=cn=ServiceBoxAllowed,ou=groups,dc=planetecitroen,dc=fr))'
+
 : ${PC_LDAP_URL:="ldap://ldap:3389"}
+_group_membership_search_expression=${_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_}
 
 #
 # check args
@@ -11,7 +14,8 @@
 
 usage ()
 {
-    echo "Usage: $0 <cloud login> <cloud password>" 1>&2
+    echo "Usage: $0 <cloud login> <cloud password> [ldap group membership search expression]
+	Default value for ldap group expression: ${_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_}" 1>&2
     exit 1
 }
 
