@@ -5,6 +5,8 @@
 #
 _DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_='(&(memberOf=cn=ServiceBoxUser,ou=groups,dc=planetecitroen,dc=fr)(memberOf=cn=ServiceBoxAllowed,ou=groups,dc=planetecitroen,dc=fr))'
 
+set -x
+
 : ${PC_LDAP_URL:="ldap://ldap:3389"}
 
 #
