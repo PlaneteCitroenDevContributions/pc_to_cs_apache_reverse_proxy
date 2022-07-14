@@ -64,6 +64,22 @@ cs_password=$(
     grep 'cs_password' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
 	   )
 
+cs_ldap_filter_group1=$(
+    grep 'filter_group1' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+	   )
+
+cs_ldap_filter_group2=$(
+    grep 'filter_group2' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+	   )
+
+cs_ldap_filter_group3=$(
+    grep 'filter_group3' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+	   )
+
+cs_ldap_filter_group4=$(
+    grep 'filter_group4' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+	   )
+
 # TODO:
 # - add ldap group filter
 # - better filter for value: echo "${x}" | sed -e 's/^\ *//' -e 's/ *$//'
@@ -143,7 +159,7 @@ checkUserpassword ()
 	esac
     fi
 
-    if "${check_pc_user_pgm}" "${username}" "${password}"
+    if "${check_pc_user_pgm}" "${username}" "${password}" "${cs_ldap_filter_group1}" "${cs_ldap_filter_group2}" "${cs_ldap_filter_group3}" "${cs_ldap_filter_group4}"
     then
 	return 0
     else
