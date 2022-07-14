@@ -48,7 +48,11 @@ buildGroupMembershipLdapSearchFilter ()
 	echo -n '(&'
 	for g in ${group_list}
 	do
-	    echo -n '(memberOf=cn='${g}',ou=groups,dc=planetecitroen,dc=fr)'
+	    # we may get an empty string due to preventive use of quoting
+	    if [[ -n "${g}" ]]
+	    then
+		echo -n '(memberOf=cn='${g}',ou=groups,dc=planetecitroen,dc=fr)'
+	    fi
 	done
 	echo -n ')'
 	)
