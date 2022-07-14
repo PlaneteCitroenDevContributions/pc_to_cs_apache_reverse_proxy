@@ -12,7 +12,7 @@ services:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential-plus.txt
         - VIRTUAL_HOST=csdepc-plus.forumtestplanetecitroen.fr
         - LETSENCRYPT_HOST=csdepc-plus.forumtestplanetecitroen.fr
-        - VIRTUAL_PORT=8889
+        - FILTER_DEBUG=fileXXXXXXX
      networks:
         - auto_https_reverse_proxy
         - internal_services
