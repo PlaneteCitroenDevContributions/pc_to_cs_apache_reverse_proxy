@@ -3,7 +3,7 @@
 #
 # configuration vars
 #
-_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_='(&(memberOf=cn=ServiceBoxUser,ou=groups,dc=planetecitroen,dc=fr)(memberOf=cn=ServiceBoxAllowed,ou=groups,dc=planetecitroen,dc=fr))'
+_DEFAULT_LDAPSEARCH_EXPRESSION_FOR_GROUP_MEMBERSHIP_='(&(memberOf=cn=Utilisateur-ServiceBox,ou=groups,dc=planetecitroen,dc=fr)(memberOf=cn=Acces-ServiceBox-Actif,ou=groups,dc=planetecitroen,dc=fr))'
 
 set -x
 
@@ -83,6 +83,21 @@ checkUserHasAccessToPC ()
 	echo "ERROR: missing username or password" 1>&2
 	return 1
     fi
+
+    #
+    # check if pc_cloud_username is an email address
+    #
+    if [[ "${pc_cloud_username}%\@*}" != "${pc_cloud_username}" ]]
+    then
+	# it contains a '@' => we consider it as an email address
+
+	# search for the corresponding uid
+	ldap_search_result=$(
+	    ldapsearch -LLL -x -H "${PC_LDAP_URL}" -b 'ou=people,dc=planetecitroen,dc=fr' -z 1 "(mail=${pc_cloud_username)" uid
+			  )
+	exit 1
+    fi
+	
 
     # TODO: add ability to log with email address
     # - if pc_cloud_username is an email address, the search for the uid
