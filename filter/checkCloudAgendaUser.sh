@@ -84,6 +84,11 @@ checkUserHasAccessToPC ()
 	return 1
     fi
 
+    # TODO: add ability to log with email address
+    # - if pc_cloud_username is an email address, the search for the uid
+    # Example: 
+    # ldapsearch -H ldap://localhost:3389 -x -b "ou=people,dc=planetecitroen,dc=fr" -z 1 "(mail=raphael.bernhard@orange.fr)" uid
+
     local dn="uid=${pc_cloud_username},ou=people,dc=planetecitroen,dc=fr"
     ldapwhoami -H "${PC_LDAP_URL}" -D "${dn}" -w "${pc_cloud_password}"
     ldap_status=$?
