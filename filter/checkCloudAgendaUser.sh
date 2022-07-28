@@ -1,4 +1,4 @@
-#! /bin/bash
+w#! /bin/bash
 
 #
 # configuration vars
@@ -87,38 +87,57 @@ checkUserHasAccessToPC ()
     #
     # check if pc_cloud_username is an email address
     #
-    if [[ "${pc_cloud_username}%\@*}" != "${pc_cloud_username}" ]]
+    local ldap_dn_to_check=''
+    if [[ "${pc_cloud_username%\@*}" != "${pc_cloud_username}" ]]
     then
 	# it contains a '@' => we consider it as an email address
 
 	# search for the corresponding uid
 	ldap_search_result=$(
-	    ldapsearch -LLL -x -H "${PC_LDAP_URL}" -b 'ou=people,dc=planetecitroen,dc=fr' -z 1 "(mail=${pc_cloud_username)" uid
+	    ldapsearch -LLL -x -H "${PC_LDAP_URL}" -b 'ou=people,dc=planetecitroen,dc=fr' -z 1 "(mail=${pc_cloud_username})" dn
 			  )
-	exit 1
+    else
+	# search for the corresponding uid
+	ldap_search_result=$(
+	    ldapsearch -LLL -x -H "${PC_LDAP_URL}" -b 'ou=people,dc=planetecitroen,dc=fr' -z 1 "(uid=${pc_cloud_username})" dn
+			  )
     fi
 	
+    retrieved_dn=$( sed -e 's/^dn:[ \t]*//' <<< ${ldap_search_result} )
+    if [[ -n "${retrieved_dn}" ]]
+    then
+	ldap_dn_to_check=${retrieved_dn}
+    else
+	ldap_dn_to_check=''
+    fi
 
-    # TODO: add ability to log with email address
-    # - if pc_cloud_username is an email address, the search for the uid
-    # Example: 
-    # ldapsearch -H ldap://localhost:3389 -x -b "ou=people,dc=planetecitroen,dc=fr" -z 1 "(mail=raphael.bernhard@orange.fr)" uid
-
-    local dn="uid=${pc_cloud_username},ou=people,dc=planetecitroen,dc=fr"
-    ldapwhoami -H "${PC_LDAP_URL}" -D "${dn}" -w "${pc_cloud_password}"
-    ldap_status=$?
+    #
+    # check if password matches
+    #
 
     local access_granted=false
-    if [[ "${ldap_status}" -eq 0 ]]
+
+    if [[ -n "${ldap_dn_to_check}" ]]
     then
+	
+	ldapwhoami -H "${PC_LDAP_URL}" -D "${ldap_dn_to_check}" -w "${pc_cloud_password}"
+	ldap_status=$?
 
-	ldap_search_result=$(
-	    ldapsearch -LLL -x -H "${PC_LDAP_URL}" -b "${dn}" "${ldap_filter_search_expression}" dn
-	    )
-
-	if [[ -n "${ldap_search_result}" ]]
+	if [[ "${ldap_status}" -eq 0 ]]
 	then
-	    access_granted=true
+
+	    # user password is OK
+
+	    # check if it matches additional filter (ex: member of the correct groups)
+
+	    ldap_search_result=$(
+		ldapsearch -LLL -x -H "${PC_LDAP_URL}" -b "${ldap_dn_to_check}" "${ldap_filter_search_expression}" dn
+			      )
+
+	    if [[ -n "${ldap_search_result}" ]]
+	    then
+		access_granted=true
+	    fi
 	fi
     fi
 
