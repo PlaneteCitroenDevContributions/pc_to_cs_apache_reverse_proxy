@@ -6,6 +6,7 @@ services:
 
   reverse-proxy-to-cs:
      restart: unless-stopped
+     hostname: reverse-proxy-to-cs-basic
      ports:
         - 8888:80
      environment:
