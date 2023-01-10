@@ -2,19 +2,49 @@
 
 version: '3'
 
+x-reverse-proxy-common:
+  &reverse-proxy-common
+  build: .
+  image: pcrproxy:latest
+  environment:
+     STAT_DATA_DIR: /var/pc_stats
+     TZ: Europe/Paris
+     FILTER_DEBUG: file
+  volumes:
+     - ./filter/:/filter/
+     - ./pc_stats/:/var/pc_stats/
+     - RPROXY_CONFIG:/etc/pcrproxy/
+  expose:
+     - "80"
+
 services:
 
-  reverse-proxy-to-cs:
-     build: .
-     image: pcrproxy:latest
+  reverse-proxy-peugeotbox:
+     <<: *reverse-proxy-common
+#     profiles: ["peugeotbox"]
+     restart: unless-stopped
+     hostname: reverse-proxy-to-peugeotbox
+     ports:
+        - "8890:80"
      environment:
-        STAT_DATA_DIR: /var/pc_stats
-        TZ: Europe/Paris
+        CREDENTIAL_FILE: /etc/pcrproxy/SECRETs/peugeotbox_credential.txt
         FILTER_DEBUG: file
      volumes:
-        - ./filter/:/filter/
-        - ./pc_stats/:/var/pc_stats/
-        - RPROXY_CONFIG:/etc/pcrproxy/
+        - ./peugeotbox-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+     networks:
+        - auto_https_reverse_proxy
+        - internal_services
+
+networks:
+   default:
+   
+   auto_https_reverse_proxy:
+      external: true
+      name: revproxy
+
+   internal_services:
+      external: true
+      name: internal_services
 
 volumes:
 
