@@ -4,13 +4,13 @@ version: '3'
 
 services:
 
-  reverse-proxy-to-peugeotbox:
+  reverse-proxy-to-cs:
      restart: unless-stopped
      hostname: reverse-proxy-to-peugeotbox
      expose:
-        - 80
+        - "80"
      ports:
-        - 8890:80
+        - "8890:80"
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/peugeotbox_credential.txt
         - FILTER_DEBUG=file
