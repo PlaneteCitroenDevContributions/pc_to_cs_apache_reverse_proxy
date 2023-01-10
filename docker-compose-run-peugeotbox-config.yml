@@ -12,8 +12,8 @@ services:
      ports:
         - "8890:80"
      environment:
-        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/peugeotbox_credential.txt
-        - FILTER_DEBUG=file
+        CREDENTIAL_FILE: /etc/pcrproxy/SECRETs/peugeotbox_credential.txt
+        FILTER_DEBUG: file
      volumes:
         - ./peugeotbox-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
      networks:
