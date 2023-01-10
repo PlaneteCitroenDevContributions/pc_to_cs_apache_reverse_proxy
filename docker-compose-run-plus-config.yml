@@ -10,9 +10,9 @@ services:
      ports:
         - 8889:80
      environment:
-        - FILTER_DEBUG=file
+        FILTER_DEBUG: file
      volumes:
-        - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
+        - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
      networks:
         - auto_https_reverse_proxy
         - internal_services
