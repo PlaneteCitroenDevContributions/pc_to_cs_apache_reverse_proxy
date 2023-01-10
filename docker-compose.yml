@@ -8,9 +8,9 @@ services:
      build: .
      image: pcrproxy:latest
      environment:
-        - STAT_DATA_DIR=/var/pc_stats
-        - TZ=Europe/Paris
-        - FILTER_DEBUG=file
+        STAT_DATA_DIR: /var/pc_stats
+        TZ: Europe/Paris
+        FILTER_DEBUG: file
      volumes:
         - ./filter/:/filter/
         - ./pc_stats/:/var/pc_stats/
