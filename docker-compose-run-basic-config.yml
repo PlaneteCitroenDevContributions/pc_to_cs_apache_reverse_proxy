@@ -10,10 +10,7 @@ services:
      ports:
         - 8888:80
      environment:
-        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
-        - VIRTUAL_HOST=csdepc.forumtestplanetecitroen.fr
-        - LETSENCRYPT_HOST=csdepc.forumtestplanetecitroen.fr
-        - VIRTUAL_PORT=80
+        - FILTER_DEBUG=file
      volumes:
         - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
      networks:
