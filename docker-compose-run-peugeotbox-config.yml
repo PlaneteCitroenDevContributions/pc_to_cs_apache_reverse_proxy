@@ -14,6 +14,8 @@ services:
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/peugeotbox_credential.txt
         - FILTER_DEBUG=file
+     volumes:
+        - ./peugeotbox-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
      networks:
         - auto_https_reverse_proxy
         - internal_services

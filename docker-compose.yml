@@ -11,9 +11,7 @@ services:
         - STAT_DATA_DIR=/var/pc_stats
         - TZ=Europe/Paris
         - FILTER_DEBUG=file
-
      volumes:
-        - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
         - ./filter/:/filter/
         - ./pc_stats/:/var/pc_stats/
         - RPROXY_CONFIG:/etc/pcrproxy/

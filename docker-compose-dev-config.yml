@@ -7,3 +7,5 @@ services:
   reverse-proxy-to-cs:
      ports:
         - 7778:80
+     volumes:
+        - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf

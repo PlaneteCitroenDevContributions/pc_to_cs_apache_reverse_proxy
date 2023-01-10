@@ -14,6 +14,8 @@ services:
         - VIRTUAL_HOST=csdepc-plus.forumtestplanetecitroen.fr
         - LETSENCRYPT_HOST=csdepc-plus.forumtestplanetecitroen.fr
         - FILTER_DEBUG=file
+     volumes:
+        - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
      networks:
         - auto_https_reverse_proxy
         - internal_services
