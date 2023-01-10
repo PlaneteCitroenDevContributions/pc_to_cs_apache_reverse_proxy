@@ -2,22 +2,23 @@
 
 version: '3'
 
-x-reverse-proxy-common:
-  &reverse-proxy-common
+x-reverse-proxy-common: &reverse-proxy-common
   build: .
   image: pcrproxy:latest
   expose:
      - "80"
 
-x-shared_volumes: &shared_volumes
+x-shared_volumes:
+  volumes: &shared_volumes
   - ./filter/:/filter/
   - ./pc_stats/:/var/pc_stats/
   - RPROXY_CONFIG:/etc/pcrproxy/
 
-x-shared_environment: &shared_environment
-  STAT_DATA_DIR: /var/pc_stats
-  TZ: Europe/Paris
-  FILTER_DEBUG: file
+x-shared_environment:
+  environment: &shared_environment
+     STAT_DATA_DIR: /var/pc_stats
+     TZ: Europe/Paris
+     FILTER_DEBUG: file
 
 services:
 
@@ -32,8 +33,8 @@ services:
         <<: *shared_environment
         CREDENTIAL_FILE: /etc/pcrproxy/SECRETs/peugeotbox_credential.txt
      volumes:
-        <<: *shared_volumes
-        - ./peugeotbox-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+#????     <<: *shared_volumes
+     - ./peugeotbox-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
      networks:
         - auto_https_reverse_proxy
         - internal_services
