@@ -5,7 +5,7 @@ version: '3'
 #
 # global shared config
 #
-x-reverse-proxy-common: &reverse-proxy-common
+x-reverse-proxy-common: &reverse-proxy-common-alias
   build: .
   image: pcrproxy:latest
   expose:
@@ -14,19 +14,19 @@ x-reverse-proxy-common: &reverse-proxy-common
 #
 # give a symbolic name to each shared volume, since anchors does not work well on volume
 #
-x-filter-volume-mapping: &filter-volume-mapping-string
+x-filter-volume-mapping: &filter-volume-mapping-string-alias
      ./filter/:/filter/
 
-x-stats-volume-mapping: &stats-volume-mapping-string
+x-stats-volume-mapping: &stats-volume-mapping-string-alias
      ./pc_stats/:/var/pc_stats/
 
-x-rproxy-config-volume-mapping: &rproxy-config-volume-mapping-string
+x-rproxy-config-volume-mapping: &rproxy-config-volume-mapping-string-alias
      RPROXY_CONFIG:/etc/pcrproxy/:ro
 
 #
 # shared environment
 #
-x-shared_environment: &shared_environment
+x-shared_environment: &shared_environment-alias
    STAT_DATA_DIR: /var/pc_stats
    TZ: Europe/Paris
    FILTER_DEBUG: file
@@ -38,19 +38,19 @@ x-shared_environment: &shared_environment
 services:
 
   reverse-proxy-peugeotbox:
-     <<: *reverse-proxy-common
+     <<: *reverse-proxy-common-alias
      profiles: ["peugeotbox"]
      restart: unless-stopped
      hostname: reverse-proxy-to-peugeotbox
      ports:
         - "8890:80"
      environment:
-        <<: *shared_environment
+        <<: *shared_environment-alias
         CREDENTIAL_FILE: /etc/pcrproxy/SECRETs/peugeotbox_credential.txt
      volumes:
-        - *filter-volume-mapping-string
-        - *stats-volume-mapping-string
-        - *rproxy-config-volume-mapping-string
+        - *filter-volume-mapping-string-alias
+        - *stats-volume-mapping-string-alias
+        - *rproxy-config-volume-mapping-string-alias
         - ./peugeotbox-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
      networks:
         - auto_https_reverse_proxy
