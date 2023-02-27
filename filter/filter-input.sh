@@ -204,6 +204,20 @@ generateStatisticEntry ()
 }
 
 #
+# compute car make ID based on VIN with Vindecoder
+
+getVinCarMakeId ()
+{
+    vin="$1"
+
+    # FIXME: not yet implemented
+
+    echo '17' # Citroen
+    return 0
+}
+
+
+#
 # DEBUG
 # =====
 #
@@ -298,13 +312,24 @@ case "${REQUEST_URI}" in
 	#
 	# user has selected a document
 	#
-	jvin_field_in_body=$( sed -e '/VIN_OK_BUTTON/s/.*jvin=\([^\&]*\).*/\1/' "${in_file}" )
+	jvin_field_in_body=$( sed -n -e '/VIN_OK_BUTTON/s/.*\&jvin=\([^\&]*\)\&.*/\1/p' "${in_file}" )
 	if [[ -n "${jvin_field_in_body}" ]]
 	then
             generateStatisticEntry "vin" "${jvin_field_in_body}" "none"
+
+	    car_make_id=$( getVinCarMakeId "${jvin_field_in_body}" )
+	    allowed_car_make_id='17'
+	    if [[ "${car_make_id}" == "${allowed_car_make_id}" ]]
+	    then
+		cp "${in_file}" "${corrected_in_file}"
+	    else
+		# generate a BAD VIN and replace it in input stream
+		TODO: compute bad vin
+		bad_vin=XF12345678987
+		sed -e '/VIN_OK_BUTTON/s/\&jvin=[^\&]*\&/\&jvin='"${bad_vin}"'\&/' "${in_file}" > "${corrected_in_file}"
+	    fi
 	fi
 
-	cp "${in_file}" "${corrected_in_file}"
 	;;
 
     * )
