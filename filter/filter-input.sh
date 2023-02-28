@@ -10,7 +10,7 @@ then
     if [[ "${FILTER_DEBUG}" == "file" ]]
     then
 	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
-	_debug_dir_="${DEBUG_ROOT_DIR}/debug_request_$( date '+%s' )"
+	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%M/%d' )/debug_request_$( date '+%s' )"
 	mkdir -m 777 -p "${_debug_dir_}"
 
 	: ${STDERR:="${_debug_dir_}/stderr.txt"}
@@ -169,6 +169,42 @@ checkUserpassword ()
 }
 
 #
+# compute car make ID based on VIN with Vindecoder
+#
+
+getVinCarMakeId ()
+{
+    vin="$1"
+
+    # FIXME: not yet implemented
+    curl_out=$( curl --silent --connect-timeout 3 --data "${vin}" "http://simple-vindecoder-server:80/vindecode-cgi-bin/cached-simple-vindecoder.cgi" )
+
+    simple_vin_decoder_status=$( echo "${curl_out}" | grep 'service_error_status:' | cut -d ':' -f 2 )
+
+    case "${simple_vin_decoder_status}" in
+	'0')
+	    # ok
+	    result_string=$( )
+	    return_status=0
+	    ;;
+	[1-9][0-9]*)
+	    # got an error code
+	    make_id=$( echo "${curl_out}" | sed -n '/^{"label":"Make"/s/.*"id:\([0-9][0-9]*\).*/\1/p')
+	    result_string="${make_id}"
+	    return_status=${simple_vin_decoder_status}
+	    ;;	    
+	* )
+	    # curl failed
+	    result_string=''
+	    return_status=99
+	    ;;
+    esac
+	    
+    echo "${result_string}"
+    return ${return_status}
+}
+
+#
 # add statistic entry
 # ===================
 
@@ -201,19 +237,6 @@ generateStatisticEntry ()
         local stat_date=$( date '+%s' )
         echo "\"${stat_date}\" \"${action}\" \"${param}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
     ) > "${stat_file}"
-}
-
-#
-# compute car make ID based on VIN with Vindecoder
-
-getVinCarMakeId ()
-{
-    vin="$1"
-
-    # FIXME: not yet implemented
-
-    echo '17' # Citroen
-    return 0
 }
 
 
