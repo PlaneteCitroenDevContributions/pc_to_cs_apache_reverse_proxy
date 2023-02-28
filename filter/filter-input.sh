@@ -176,7 +176,6 @@ getVinCarMakeId ()
 {
     vin="$1"
 
-    # FIXME: not yet implemented
     curl_out=$( curl --silent --connect-timeout 3 --data "${vin}" "http://simple-vindecoder-server:80/vindecode-cgi-bin/cached-simple-vindecoder.cgi" )
 
     simple_vin_decoder_status=$( echo "${curl_out}" | grep 'service_error_status:' | cut -d ':' -f 2 )
@@ -341,14 +340,22 @@ case "${REQUEST_URI}" in
             generateStatisticEntry "vin" "${jvin_field_in_body}" "none"
 
 	    car_make_id=$( getVinCarMakeId "${jvin_field_in_body}" )
-	    allowed_car_make_id='17'
-	    if [[ "${car_make_id}" == "${allowed_car_make_id}" ]]
+	    declare -a allowed_car_make_id_array=( '17' '89' )
+	    allowed_id=false
+	    for id in "${allowed_car_make_id_array[@]}"
+	    do
+		if [[ "${car_make_id}" == "${id}" ]]
+		then
+		    allowed_id=true
+		    break
+		fi
+	    done
+	    if ${allowed_id}
 	    then
 		cp "${in_file}" "${corrected_in_file}"
 	    else
-		# generate a BAD VIN and replace it in input stream
-		TODO: compute bad vin
-		bad_vin=XF12345678987
+		# generate a BAD VIN and replacing the first character by 'X'
+		bad_vin="X${jvin_field_in_body:1}"
 		sed -e '/VIN_OK_BUTTON/s/\&jvin=[^\&]*\&/\&jvin='"${bad_vin}"'\&/' "${in_file}" > "${corrected_in_file}"
 	    fi
 	fi
