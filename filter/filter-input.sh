@@ -341,7 +341,7 @@ case "${REQUEST_URI}" in
 
 	    car_make_id=$( getVinCarMakeId "${jvin_field_in_body}" )
 	    declare -a allowed_car_make_id_array=( '17' '89' )
-	    allowed_id=false
+	    id_is_allowed=false
 	    for id in "${allowed_car_make_id_array[@]}"
 	    do
 		if [[ "${car_make_id}" == "${id}" ]]
@@ -350,10 +350,13 @@ case "${REQUEST_URI}" in
 		    break
 		fi
 	    done
-	    if ${allowed_id}
+	    if ${id_is_allowed}
 	    then
+		# transmit input as it
 		cp "${in_file}" "${corrected_in_file}"
 	    else
+		# alter stream so that the server generates an error
+		#
 		# generate a BAD VIN and replacing the first character by 'X'
 		bad_vin="X${jvin_field_in_body:1}"
 		sed -e '/VIN_OK_BUTTON/s/\&jvin=[^\&]*\&/\&jvin='"${bad_vin}"'\&/' "${in_file}" > "${corrected_in_file}"
