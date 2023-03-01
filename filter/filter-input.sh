@@ -6,6 +6,9 @@ ENV_FILE="${HERE}/env-${PGM_BASENAME}"
 
 : ${SIMPLE_VIN_DECODER_PORT_URL:="http://simple-vindecoder-server:80/vindecode-cgi-bin/cached-simple-vindecoder.cgi"}
 
+# TMP
+FILTER_DEBUG=yes
+
 if [[ -n "${FILTER_DEBUG}" ]]
 then
     set -x
@@ -198,18 +201,18 @@ getVinCarMakeId ()
 
     curl_out=$( curl --silent --connect-timeout 3 --data "${vin}" "${SIMPLE_VIN_DECODER_PORT_URL}" )
 
-    simple_vin_decoder_status=$( echo "${curl_out}" | grep 'service_error_status:' | cut -d ':' -f 2 )
+    simple_vin_decoder_status=$( echo "${curl_out}" | grep 'service_error_status:' | cut -d ':' -f 2 | tr --delete '[:space:]' )
 
     case "${simple_vin_decoder_status}" in
 	'0')
 	    # ok
-	    result_string=$( )
+	    make_id=$( echo "${curl_out}" | sed -n '/^{"label":"Make"/s/.*,"id":\([1-9][0-9]*\).*/\1/p')
+	    result_string="${make_id}"
 	    return_status=0
 	    ;;
 	[1-9][0-9]*)
 	    # got an error code
-	    make_id=$( echo "${curl_out}" | sed -n '/^{"label":"Make"/s/.*"id:\([0-9][0-9]*\).*/\1/p')
-	    result_string="${make_id}"
+	    result_string=''
 	    return_status=${simple_vin_decoder_status}
 	    ;;	    
 	* )
@@ -398,7 +401,7 @@ case "${REQUEST_URI}" in
 		# transmit input as it
 		cp "${in_file}" "${corrected_in_file}"
 
-		generateStatisticEntry "vin" "${jvin_field_in_body}" "{\"status\": \"OK\"; \"make\": \"${car_make_id}\"}"
+		generateStatisticEntry "vin" "${jvin_field_in_body}" "{\"status\": \"OK\"; \"make\": \"no make filtering\"}"
 
 	    else
 		# alter stream so that the server generates an error
