@@ -4,6 +4,8 @@ HERE=$( dirname "$0" )
 PGM_BASENAME=$( basename "$0" )
 ENV_FILE="${HERE}/env-${PGM_BASENAME}"
 
+: ${SIMPLE_VIN_DECODER_PORT_URL:="http://simple-vindecoder-server:80/vindecode-cgi-bin/cached-simple-vindecoder.cgi"}
+
 if [[ -n "${FILTER_DEBUG}" ]]
 then
     set -x
@@ -176,7 +178,7 @@ getVinCarMakeId ()
 {
     vin="$1"
 
-    curl_out=$( curl --silent --connect-timeout 3 --data "${vin}" "http://simple-vindecoder-server:80/vindecode-cgi-bin/cached-simple-vindecoder.cgi" )
+    curl_out=$( curl --silent --connect-timeout 3 --data "${vin}" "${SIMPLE_VIN_DECODER_PORT_URL}" )
 
     simple_vin_decoder_status=$( echo "${curl_out}" | grep 'service_error_status:' | cut -d ':' -f 2 )
 
