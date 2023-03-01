@@ -58,6 +58,8 @@ credential_file_effective_content=$(
 )
 
 : ${CREDENTIAL_FILE:="${HERE}/cs_credential.txt"}
+
+# get login credential
 cs_login=$(
     grep 'cs_login' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
 )
@@ -66,6 +68,7 @@ cs_password=$(
     grep 'cs_password' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
 	   )
 
+# get ldap filtering information
 cs_ldap_filter_group1=$(
     grep 'filter_group1' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
 	   )
@@ -80,12 +83,27 @@ cs_ldap_filter_group3=$(
 
 cs_ldap_filter_group4=$(
     grep 'filter_group4' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
-	   )
+		     )
 
-# TODO:
-# - add ldap group filter
-# - better filter for value: echo "${x}" | sed -e 's/^\ *//' -e 's/ *$//'
+# get allowed vin make ids
+allowed_vin_make_id1=$(
+    grep 'allowed_vin_make_id1' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+		     )
 
+allowed_vin_make_id2=$(
+    grep 'allowed_vin_make_id2' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+		    )
+
+allowed_vin_make_id3=$(
+    grep 'allowed_vin_make_id3' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+		     )
+
+allowed_vin_make_id4=$(
+    grep 'allowed_vin_make_id4' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+		     )
+#
+# test collected values
+#
 
 if [[ -z "${cs_login}" ]]
 then
@@ -334,34 +352,63 @@ case "${REQUEST_URI}" in
 
     "/do/ok" )
 	#
-	# user has selected a document
+	# user has entered a VIN
 	#
 	jvin_field_in_body=$( sed -n -e '/VIN_OK_BUTTON/s/.*\&jvin=\([^\&]*\)\&.*/\1/p' "${in_file}" )
 	if [[ -n "${jvin_field_in_body}" ]]
 	then
-            generateStatisticEntry "vin" "${jvin_field_in_body}" "none"
 
-	    car_make_id=$( getVinCarMakeId "${jvin_field_in_body}" )
-	    declare -a allowed_car_make_id_array=( '17' '89' )
-	    id_is_allowed=false
-	    for id in "${allowed_car_make_id_array[@]}"
+	    #
+	    # check if car make is allowed
+	    #
+
+	    # build array from configuration params
+
+	    declare -a allowed_car_make_id_array
+	    for id in "${allowed_vin_make_id1}" "${allowed_vin_make_id2}" "${allowed_vin_make_id3}" "${allowed_vin_make_id4}"
 	    do
-		if [[ "${car_make_id}" == "${id}" ]]
+		if [[ -n "${id}" ]]
 		then
-		    allowed_id=true
-		    break
+		    allowed_car_make_id_array+=( "${id}" )
 		fi
 	    done
-	    if ${id_is_allowed}
+
+	    if [[ ${#allowed_car_make_id_array[@]} -eq 0 ]]
+	    then
+		# no car make filtering configuration provided => no filtering
+		vin_entry_is_allowed=true
+	    else
+		# check if car make for to the typed vin is allowed
+
+		car_make_id=$( getVinCarMakeId "${jvin_field_in_body}" )
+
+		vin_entry_is_allowed=false
+		for id in "${allowed_car_make_id_array[@]}"
+		do
+		    if [[ "${car_make_id}" == "${id}" ]]
+		    then
+			vin_entry_is_allowed=true
+		    break
+		    fi
+		done
+	    fi
+
+	    if ${vin_entry_is_allowed}
 	    then
 		# transmit input as it
 		cp "${in_file}" "${corrected_in_file}"
+
+		generateStatisticEntry "vin" "${jvin_field_in_body}" "{\"status\": \"OK\"; \"make\": \"${car_make_id}\"}"
+
 	    else
 		# alter stream so that the server generates an error
 		#
 		# generate a BAD VIN and replacing the first character by 'X'
 		bad_vin="X${jvin_field_in_body:1}"
 		sed -e '/VIN_OK_BUTTON/s/\&jvin=[^\&]*\&/\&jvin='"${bad_vin}"'\&/' "${in_file}" > "${corrected_in_file}"
+
+		generateStatisticEntry "vin" "${jvin_field_in_body}" "{\"status\": \"NOK\"; \"make\": \"${car_make_id}\"}"
+		
 	    fi
 	fi
 
