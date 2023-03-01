@@ -6,9 +6,6 @@ ENV_FILE="${HERE}/env-${PGM_BASENAME}"
 
 : ${SIMPLE_VIN_DECODER_PORT_URL:="http://simple-vindecoder-server:80/vindecode-cgi-bin/cached-simple-vindecoder.cgi"}
 
-# TMP
-FILTER_DEBUG=yes
-
 if [[ -n "${FILTER_DEBUG}" ]]
 then
     set -x
