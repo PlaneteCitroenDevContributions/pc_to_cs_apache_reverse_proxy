@@ -24,9 +24,9 @@ services:
 
 networks:
    auto_https_reverse_proxy:
-      external:
-         name: revproxy
+      name: revproxy
+      external: true
 
    internal_services:
-      external:
-         name: internal_services
+      name: internal_services
+      external: true
