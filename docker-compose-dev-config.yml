@@ -7,3 +7,17 @@ services:
   reverse-proxy-to-cs:
      ports:
         - 7778:80
+     environment:
+        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
+     networks:
+        - auto_https_reverse_proxy
+        - internal_services
+
+networks:
+   auto_https_reverse_proxy:
+      external:
+         name: revproxy
+
+   internal_services:
+      external:
+         name: internal_services
