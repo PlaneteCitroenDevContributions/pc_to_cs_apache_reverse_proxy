@@ -10,7 +10,6 @@ services:
      environment:
         - STAT_DATA_DIR=/var/pc_stats
         - TZ=Europe/Paris
-#!!!        - FILTER_DEBUG=file
 
      volumes:
         - ./cs2pc-rproxy-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
