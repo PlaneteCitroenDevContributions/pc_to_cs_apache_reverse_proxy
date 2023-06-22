@@ -7,8 +7,17 @@ services:
   reverse-proxy-to-cs:
      ports:
         - 7778:80
+     expose:
+        - 80
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
+        - FILTER_DEBUG=stdout
+     labels: # add directly Traefik config to prevent additionnal socat
+      - "traefik.enable=true"
+      - "traefik.http.routers.forwardcs2pc-dev-csdepc.rule=Host(`dev-csdepc.forumtestplanetecitroen.fr`)"
+      - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls=true"
+      - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls.certresolver=letsencrypt-resolver"
+      - "traefik.http.routers.forwardcs2pc-dev-csdepc.entrypoints=websecure"
      networks:
         - auto_https_reverse_proxy
         - internal_services
