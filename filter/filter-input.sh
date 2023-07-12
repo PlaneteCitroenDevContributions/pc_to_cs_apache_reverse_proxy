@@ -249,37 +249,55 @@ case "${REQUEST_URI}" in
 
     "/do/login" )
 	#
-	# get provided credential
+	# get provided credentials from the body
 	#
 	userid=$(
 	    sed -e 's/.*&userid=\([^&]*\)&.*/\1/' "${in_file}"
 	      )
 	password=$(
 	    sed -e 's/.*&password=\([^&]*\)&.*/\1/' "${in_file}"
-	      )
+		)
 
-	pc_login_success=false
-	loginUserid="bad_planete_citroen_association_login_${username}"
-	loginPassword="bad_planete_citroen_association_password_${password}"
-	if checkUsername "${userid}"
+	if [[ -z "${userid}" ]]
 	then
-	    url_decoded_user_id=$( url_decode "${userid}" )
-	    url_decoded_password=$( url_decode "${password}" )
-	    if checkUserpassword "${url_decoded_user_id}" "${url_decoded_password}"
-	    then
-		loginUserid="${cs_login}"
-		loginPassword="${cs_password}"
-		pc_login_success=true
-	    fi
-	fi
+	    #
+	    # login request does not contain any userid
+	    # this request seems to be used to configure the login page
+	    #
 
-	sed -e 's/&userid=[^&]*&password=[^&]*&/\&userid='${loginUserid}'\&password='${loginPassword}'\&/' "${in_file}" > "${corrected_in_file}"
-
-	if ${pc_login_success}
-	then
-	    generateStatisticEntry "login" "${userid}" success
+	    # we keep the content unchanged
+	    cp "${in_file}" "${corrected_in_file}"
 	else
-	    generateStatisticEntry "login" "${userid}" fail
+
+	    #
+	    # effective login/password test
+	    # =>
+	    #    * check if user is allowed on PC side
+	    #    * if so, replace with the valid ServiceBox credentials
+
+	    pc_login_success=false
+	    loginUserid="bad_planete_citroen_association_login_${username}"
+	    loginPassword="bad_planete_citroen_association_password_${password}"
+	    if checkUsername "${userid}"
+	    then
+		url_decoded_user_id=$( url_decode "${userid}" )
+		url_decoded_password=$( url_decode "${password}" )
+		if checkUserpassword "${url_decoded_user_id}" "${url_decoded_password}"
+		then
+		    loginUserid="${cs_login}"
+		    loginPassword="${cs_password}"
+		    pc_login_success=true
+		fi
+	    fi
+
+	    sed -e 's/&userid=[^&]*&password=[^&]*&/\&userid='${loginUserid}'\&password='${loginPassword}'\&/' "${in_file}" > "${corrected_in_file}"
+
+	    if ${pc_login_success}
+	    then
+		generateStatisticEntry "login" "${userid}" success
+	    else
+		generateStatisticEntry "login" "${userid}" fail
+	    fi
 	fi
 
 	;;
