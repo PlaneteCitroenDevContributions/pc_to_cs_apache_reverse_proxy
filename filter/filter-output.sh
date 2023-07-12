@@ -14,7 +14,8 @@ then
     if [[ "${FILTER_DEBUG}" == "file" ]]
     then
 	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
-	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%s' )-reponse"
+	_document_uri_to_system_path_=$( echo "${DOCUMENT_URI}" | sed -e 's+/+_+g' )
+	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%s' )-${_document_uri_to_system_path_}-response"
 	mkdir -m 777 -p "${_debug_dir_}"
 
 	: ${STDERR:="${_debug_dir_}/stderr.txt"}
