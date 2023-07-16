@@ -1,4 +1,4 @@
-w#! /bin/bash
+#! /bin/bash
 
 #
 # configuration vars
