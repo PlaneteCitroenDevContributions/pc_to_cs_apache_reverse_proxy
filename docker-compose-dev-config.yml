@@ -7,10 +7,6 @@ services:
   reverse-proxy-to-cs:
      ports:
         - 7778:80
-<<<<<<< HEAD
-     volumes:
-        - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
-=======
      expose:
         - 80
      environment:
@@ -39,4 +35,3 @@ networks:
    internal_services:
       name: internal_services
       external: true
->>>>>>> dev
