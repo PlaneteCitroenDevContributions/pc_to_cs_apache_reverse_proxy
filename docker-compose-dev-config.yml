@@ -7,8 +7,6 @@ services:
   reverse-proxy-to-cs:
      ports:
         - 7778:80
-     expose:
-        - 80
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
         - FILTER_DEBUG=file
