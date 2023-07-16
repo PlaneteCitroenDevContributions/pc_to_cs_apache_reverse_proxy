@@ -7,5 +7,36 @@ services:
   reverse-proxy-to-cs:
      ports:
         - 7778:80
+<<<<<<< HEAD
      volumes:
         - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf
+=======
+     expose:
+        - 80
+     environment:
+        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
+        - FILTER_DEBUG=file
+        - DEBUG_ROOT_DIR=/var/pc_debug
+     volumes:
+        - ./htdocs4servicebox-pr/:/usr/local/apache2/htdocs:ro
+        - ./DEBUG/filter/:/var/pc_debug/:rw
+     labels: # add directly Traefik config to prevent additionnal socat
+        - "traefik.enable=true"
+        - "traefik.http.routers.forwardcs2pc-dev-csdepc.rule=Host(`dev-csdepc.forumtestplanetecitroen.fr`)"
+#        - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls=true"
+        - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls=false"
+        - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls.certresolver=letsencrypt-resolver"
+        - "traefik.http.routers.forwardcs2pc-dev-csdepc.entrypoints=websecure, web"
+     networks:
+        - auto_https_reverse_proxy
+        - internal_services
+
+networks:
+   auto_https_reverse_proxy:
+      name: revproxy
+      external: true
+
+   internal_services:
+      name: internal_services
+      external: true
+>>>>>>> dev

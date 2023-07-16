@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="pc_to_cs_apache_reverse_proxy">
+        <wb-resource deploy-path="/" source-path="/public"/>
+        <property name="context-root" value="pc_to_cs_apache_reverse_proxy"/>
+    </wb-module>
+</project-modules>

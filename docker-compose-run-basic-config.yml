@@ -10,9 +10,13 @@ services:
      ports:
         - 8888:80
      environment:
+<<<<<<< HEAD
         FILTER_DEBUG: file
      volumes:
         - ./my-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+=======
+        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
+>>>>>>> dev
      networks:
         - auto_https_reverse_proxy
         - internal_services
