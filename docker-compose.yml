@@ -19,9 +19,11 @@ services:
 
      volumes:
         - ./cs2pc-rproxy-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+        - ./htdocs4servicebox-pr/:/usr/local/apache2/htdocs:ro
         - ./filter/:/filter/:ro
-        - ./pc_stats/:/var/pc_stats/
         - RPROXY_CONFIG:/etc/pcrproxy/:ro
+        - ./pc_stats/:/var/pc_stats/:rw
+        - ./DEBUG/filter/:/var/pc_debug/:rw
 
 volumes:
 

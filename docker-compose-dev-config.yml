@@ -12,10 +12,6 @@ services:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
         - FILTER_DEBUG=file
 
-     volumes:
-        - ./htdocs4servicebox-pr/:/usr/local/apache2/htdocs:ro
-        - ./DEBUG/filter/:/var/pc_debug/:rw
-
      labels: # add directly Traefik config to prevent additionnal socat
         - "traefik.enable=true"
         - "traefik.http.routers.forwardcs2pc-dev-csdepc.rule=Host(`dev-csdepc.forumtestplanetecitroen.fr`)"
