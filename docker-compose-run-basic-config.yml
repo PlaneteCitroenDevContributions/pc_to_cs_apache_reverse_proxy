@@ -7,19 +7,22 @@ services:
   reverse-proxy-to-cs:
      restart: unless-stopped
      hostname: reverse-proxy-to-cs-basic
+
      ports:
         - 8888:80
+
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
+
      networks:
         - auto_https_reverse_proxy
         - internal_services
 
 networks:
    auto_https_reverse_proxy:
-      external:
-         name: revproxy
+      external: true
+      name: revproxy
 
    internal_services:
-      external:
-         name: internal_services
+      external: true
+      name: internal_services
