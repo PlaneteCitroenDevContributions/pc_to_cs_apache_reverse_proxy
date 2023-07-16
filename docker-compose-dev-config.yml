@@ -19,9 +19,10 @@ services:
      labels: # add directly Traefik config to prevent additionnal socat
         - "traefik.enable=true"
         - "traefik.http.routers.forwardcs2pc-dev-csdepc.rule=Host(`dev-csdepc.forumtestplanetecitroen.fr`)"
-        - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls=true"
+#        - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls=true"
+        - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls=false"
         - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls.certresolver=letsencrypt-resolver"
-        - "traefik.http.routers.forwardcs2pc-dev-csdepc.entrypoints=websecure"
+        - "traefik.http.routers.forwardcs2pc-dev-csdepc.entrypoints=websecure, web"
      networks:
         - auto_https_reverse_proxy
         - internal_services
