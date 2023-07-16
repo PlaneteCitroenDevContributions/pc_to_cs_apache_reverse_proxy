@@ -7,12 +7,16 @@ services:
   reverse-proxy-to-cs:
      build: .
      image: pcrproxy:latest
+
      expose:
         - 80
+
      environment:
         STAT_DATA_DIR: /var/pc_stats
         TZ: Europe/Paris
         FILTER_DEBUG: file
+        DEBUG_ROOT_DIR: /var/pc_debug
+
      volumes:
         - ./cs2pc-rproxy-httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
         - ./filter/:/filter/:ro
