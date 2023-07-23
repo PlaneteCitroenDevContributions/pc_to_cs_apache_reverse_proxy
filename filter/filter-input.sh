@@ -248,6 +248,12 @@ case "${REQUEST_URI}" in
 	;;
 
     /do/login* ) # same as <LocationMatch "^/do/login.*"> in http.conf
+
+	# TODO:
+	# the behavior between GET and POST method is not the same
+	# should be check at the begining to orient execution
+	#
+
 	#
 	# get provided credentials from the body
 	#
