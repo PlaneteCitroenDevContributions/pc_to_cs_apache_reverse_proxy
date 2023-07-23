@@ -10,7 +10,7 @@ then
     if [[ "${FILTER_DEBUG}" == "file" ]]
     then
 	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
-	_document_uri_to_system_path_=$( echo "${DOCUMENT_URI}" | sed -e 's+/+_+g' )
+	_document_uri_to_system_path_=$( urlencode "${DOCUMENT_URI}" )
 	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%s' )-${_document_uri_to_system_path_}-request"
 	mkdir -m 777 -p "${_debug_dir_}"
 
@@ -247,7 +247,7 @@ case "${REQUEST_URI}" in
 	sed -e 's/username=.*$/username='${elapseTimeUserName}'/' "${in_file}" > "${corrected_in_file}"
 	;;
 
-    '/do/login' | /do/login\?* )
+    /do/login* ) # same as <LocationMatch "^/do/login.*"> in http.conf
 	#
 	# get provided credentials from the body
 	#
