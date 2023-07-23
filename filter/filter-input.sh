@@ -247,7 +247,7 @@ case "${REQUEST_URI}" in
 	sed -e 's/username=.*$/username='${elapseTimeUserName}'/' "${in_file}" > "${corrected_in_file}"
 	;;
 
-    "/do/login" )
+    '/do/login' | /do/login\?* )
 	#
 	# get provided credentials from the body
 	#
