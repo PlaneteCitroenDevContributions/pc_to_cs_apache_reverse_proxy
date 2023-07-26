@@ -10,7 +10,6 @@ services:
 
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
-        - FILTER_DEBUG=file
 
      labels: # add directly Traefik config to prevent additionnal socat
         - "traefik.enable=true"
@@ -18,7 +17,7 @@ services:
 #        - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls=true"
         - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls=false"
         - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls.certresolver=letsencrypt-resolver"
-        - "traefik.http.routers.forwardcs2pc-dev-csdepc.entrypoints=websecure, web"
+        - "traefik.http.routers.forwardcs2pc-dev-csdepc.entrypoints=web"
 
      networks:
         - auto_https_reverse_proxy
