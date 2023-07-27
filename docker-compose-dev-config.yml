@@ -5,6 +5,7 @@ version: '3'
 services:
 
   reverse-proxy-to-cs:
+     hostname: reverse-proxy-to-cs-dev
      ports:
         - 7778:80
 
