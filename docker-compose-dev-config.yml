@@ -1,7 +1,5 @@
 # -*- mode: indented-text; tab-width: 3; indent-tabs-mode: nil -*-
 
-version: '3'
-
 services:
 
   reverse-proxy-to-cs:
@@ -14,10 +12,10 @@ services:
 
      labels: # add directly Traefik config to prevent additionnal socat
         - "traefik.enable=true"
-        - "traefik.http.routers.forwardcs2pc-dev-csdepc.rule=Host(`dev-csdepc.forumtestplanetecitroen.fr`)"
-        - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls=true"
-        - "traefik.http.routers.forwardcs2pc-dev-csdepc.tls.certresolver=letsencrypt-resolver"
-        - "traefik.http.routers.forwardcs2pc-dev-csdepc.entrypoints=web,websecure"
+        - "traefik.http.routers.servicebox-dev.rule=Host(`servicebox-dev.forumtestplanetecitroen.fr`)"
+        - "traefik.http.routers.servicebox-dev.tls=true"
+        - "traefik.http.routers.servicebox-dev.tls.certresolver=letsencrypt-resolver"
+        - "traefik.http.routers.servicebox-dev.entrypoints=websecure"
 
      networks:
         - auto_https_reverse_proxy
