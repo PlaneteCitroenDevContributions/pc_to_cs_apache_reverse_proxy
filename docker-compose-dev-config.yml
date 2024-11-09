@@ -12,7 +12,7 @@ services:
 
      labels: # add directly Traefik config to prevent additionnal socat
         - "traefik.enable=true"
-        - "traefik.http.routers.servicebox-dev.rule=Host(`servicebox-dev.forumtestplanetecitroen.fr`)"
+        - "traefik.http.routers.servicebox-dev.rule=Host(`dev.servicebox.forumtestplanetecitroen.fr`)"
         - "traefik.http.routers.servicebox-dev.tls=true"
         - "traefik.http.routers.servicebox-dev.tls.certresolver=letsencrypt-resolver"
         - "traefik.http.routers.servicebox-dev.entrypoints=websecure"
