@@ -1,7 +1,5 @@
 # -*- mode: indented-text; tab-width: 3; indent-tabs-mode: nil -*-
 
-version: '3'
-
 services:
 
   reverse-proxy-to-cs:
