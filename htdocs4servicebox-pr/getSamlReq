@@ -43,6 +43,61 @@ query_string_array_init_val=$(
 )
 eval declare -A query_string_array=( ${query_string_array_init_val} )
 
+#
+# get SAML Auth
+#
+
+# get JSESSIONID PSACOUNTRY & BIGIPSERVER cookies
+
+_old_IFS="${IFS}"
+IFS=';, ';
+for i in ${HTTP_COOKIE}
+do
+    case "${i}" in
+	JSESSIONID\=* )
+	    SET_JSESSIONID="${i}"
+	    ;;
+	PSACountry\=* )
+	    SET_PSA_COUNTRY="${i}"
+	    ;;
+
+	 BIGipServer* )
+	    SET_BIGIPSERVER="${i}"
+	    ;;
+
+	* )
+	    ;;
+    esac
+done
+IFS="${_old_IFS}"
+
+: ${PUBLIC_SERVICE_BOX_ROOT_URL:='https://public.servicebox-parts.com/'}
+
+USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0"
+HTTP_REQ=$(curl \
+	   -s \
+	   -D - \
+	   -A "${USERAGENT}" \
+	   -X POST \
+	   -H "Cookie: ${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} " \
+	   -d '' \
+	   "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq" \
+	)
+
+while IFS= read -r header
+do
+        if [[ $header == *"gigyaUrl"* ]]; then
+                GIGYAURL=$(echo -n $header | sed 's/^gigyaUrl: \(.*\)\r/\1/i')
+                APIKEY=$(echo $header | sed 's/.*v2.0\/\([a-zA-Z0-9\-_]*\)\/.*$/\1/i')
+        fi
+        if [[ $header == *"SAMLRequest"* ]]; then
+                SAMLREQUEST=$(echo -n $header | sed 's/^SAMLRequest: \(.*\)\r/\1/i')
+                SAMLREQUEST_ENCODED=$(urlencode $SAMLREQUEST)
+        fi
+done <<< "$HTTP_REQ"
+
+
+
 echo 'Content-type: text/html'
 echo 'RespHead: ABC'
 echo "Set-Cookie: eee=1"
@@ -68,4 +123,127 @@ echo '</span>
 </html>
 '
 
+
+
 exit 0
+
+
+
+# IMPORTED OCDE
+
+
+
+LOGIN=""
+PASSWORD=""
+TIME=$(date +"%H:%M")
+USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0"
+
+urlencode() {
+    # urlencode <string>
+
+    old_lc_collate=$LC_COLLATE
+    LC_COLLATE=C
+
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:$i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf '%s' "$c" ;;
+            *) printf '%%%02X' "'$c" ;;
+        esac
+    done
+
+    LC_COLLATE=$old_lc_collate
+}
+
+LOGIN_TOKEN=""
+
+HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X GET "https://public.servicebox-parts.com/")
+while IFS= read -r header
+do
+    if [[ $header == "Set-Cookie: JSESSIONID"* ]]; then
+                JSESSIONID=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1
+/i')
+        fi
+        if [[ $header == "Set-Cookie: BIGipServer"* ]]; then
+                BIGIPSERVER=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\
+1/i')
+        fi
+        if [[ $header == "Set-Cookie: PSACountry"* ]]; then
+                PSACOUNTRY=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1
+/i')
+        fi
+done <<< "$HTTP_REQ"
+
+HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X POST "https://public.servicebox-parts.com/getSamlReq" -H "Cookie: ${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} " -d "")
+while IFS= read -r header
+do
+        if [[ $header == *"gigyaUrl"* ]]; then
+                GIGYAURL=$(echo -n $header | sed 's/^gigyaUrl: \(.*\)\r/\1/i')
+                APIKEY=$(echo $header | sed 's/.*v2.0\/\([a-zA-Z0-9\-_]*\)\/.*$/\1/i')
+        fi
+        if [[ $header == *"SAMLRequest"* ]]; then
+                SAMLREQUEST=$(echo -n $header | sed 's/^SAMLRequest: \(.*\)\r/\1/i')
+                SAMLREQUEST_ENCODED=$(urlencode $SAMLREQUEST)
+        fi
+done <<< "$HTTP_REQ"
+
+HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X GET "${GIGYAURL}?SAMLRequest=${SAMLREQUEST_ENCODED}")
+while IFS= read -r header
+do
+        if [[ $header == *"samlContext="* ]]; then
+                SAMLCONTEXT=$(echo -n $header | sed 's/.*samlContext=\([^&]*\).*/\1/i')
+        fi
+done <<< "$HTTP_REQ"
+
+HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X GET "https://login-ra.fiat.com/accounts.webSdkBootstrap?apiKey=${APIKEY}&pageURL=${GIGYAURL}?SAMLRequest=$
+{SAMLREQUEST}&sdk=js_latest&sdkBuild=16506&format=json")
+while IFS= read -r header
+do
+        if [[ $header == *"gmid="* ]]; then
+                GMID=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1/i')
+        fi
+        if [[ $header == *"ucid="* ]]; then
+                UCID=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1/i')
+        fi
+        if [[ $header == *"hasGmid="* ]]; then
+                HASGMID=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1/i')
+        fi
+done <<< "$HTTP_REQ"
+
+RISKCONTEXT=$(urlencode "{\"b0\":53295,\"b1\":[104,68,180,220],\"b2\":6,\"b3\":[],\"b4\":6,\"b5\":1,\"b6\":\"${USERAGENT}\",\"b7\":[],\"b8\":\"${TIME}:
+00\",\"b9\":-120,\"b10\":{\"state\":\"prompt\"},\"b11\":false,\"b12\":{\"charging\":true,\"chargingTime\":0,\"dischargingTime\":null,\"level\":1},\"b13
+\":[null,\"1024|728|24\",false,true]}")
+
+HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X POST "https://login-ra.fiat.com/accounts.login" -d "loginID=${LOGIN}&password=${PASSWORD}&sessionExpiratio
+n=2628000&targetEnv=jssdk&include=profile%2Cdata%2Cemails%2Csubscriptions%2Cpreferences%2C&includeUserInfo=true&loginMode=standard&lang=fr&riskContext=
+${RISKCONTEXT}&APIKey=${APIKEY}&source=showScreenSet&sdk=js_latest&authMode=cookie&pageURL=https%3A%2F%2Flogin-ra.fiat.com%2F&sdkBuild=16506&format=jso
+n" -H "Cookie: ${GMID} ${UCID} ${HASGMID} ")
+while IFS= read -r header
+do
+        if [[ $header == *"glt_"* ]]; then
+                GLT=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1/i')
+                LOGIN_TOKEN=$(echo $header | sed 's/^Set-Cookie: [^=]*=\([^;]*\);.*$/\1/i')
+        fi
+done <<< "$HTTP_REQ"
+
+if [[ $LOGIN_TOKEN == "" ]]; then
+        echo "Login ERROR"
+        exit 1
+fi
+
+HTTP_REQ=$(curl -s -A "${USERAGENT}" -X GET "https://login-ra.fiat.com/saml/v2.0/${APIKEY}/idp/sso/continue?samlContext=${SAMLCONTEXT}&loginToken=${LOG
+IN_TOKEN}" -H "Cookie: ${GMID} ${UCID} ${HASGMID} ")
+while IFS= read -r data
+do
+        if [[ $data == *"SAMLResponse"* ]]; then
+                SAMLRESPONSE=$(echo $data | sed 's/.* name="SAMLResponse" value="\([^"]*\).*$/\1/i')
+                SAMLRESPONSE_ENCODED=$(urlencode $SAMLRESPONSE)
+                SERVICEBOX_URL=$(echo $data | sed 's/.* method="post" action="\([^"]*\).*$/\1/i')
+        fi
+done <<< "$HTTP_REQ"
+
+HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X POST "${SERVICEBOX_URL}" -d "SAMLResponse=${SAMLRESPONSE_ENCODED}" -H "Cookie: ${JSESSIONID} ${PSACOUNTRY}
+ ${BIGIPSERVER} ")
+
+echo "${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} "
