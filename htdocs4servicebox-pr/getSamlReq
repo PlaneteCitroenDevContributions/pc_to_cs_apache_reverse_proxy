@@ -73,24 +73,42 @@ IFS="${_old_IFS}"
 
 : ${PUBLIC_SERVICE_BOX_ROOT_URL:='https://public.servicebox-parts.com/'}
 
-USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0"
-HTTP_REQ=$(curl \
-	   -s \
-	   -D - \
-	   -A "${USERAGENT}" \
-	   -X POST \
-	   --cookie "${SET_BIGIPSERVER]" \
-	   --cookie "${SET_PSA_COUNTRY]" \
-	   --cookie "${SET_JSESSIONID}" \
-	   -d '' \
-	   "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq" \
-	)
+USERAGENT='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0'
+
+test_HTTP_REQ=':status: 200
+cache-control: no-cache, no-store, max-age=0
+date: Sun, 10 Nov 2024 08:31:56 GMT
+gigyaurl: https://fidm.eu1.gigya.com/saml/v2.0/4_orFmUKH1TrnP0kMf3hryrA/idp/sso
+pc-rproxy-trace: Traffic caught at t=1731227516883954 for dev.servicebox.forumtestplanetecitroen.fr, proto https
+pragma: no-cache
+samllogoutrequest: hZFRa8IwEMff9ylK3tMktUobrCKITKYgm%2B5hLyOpsYa1SZdLi377RZ3gw2Cvd%2Fnd%2F%2B6X8fTU1FGvHGhrCsRiiiJlSrvXpirQbrvAGZpOnsYgmrpN%2BMpWtvOv6rtT4KOAGuC3VoE6Z7gVoIEb0SjgvuRvs%2FWKJzHlrbPelrZG0TyA2gh%2FjTt63wIn5KD3Taw6Fle6Oou4tA25TCV9YEn6ad2i2b08s60zG%2Fq1PgyO7uxmRO9bArVF0XJeoMMwUyJjIywFTXFKM4FlzjIsB2mS5rmUQ5mEl7ARALpXARA1qEsFOrU04IXxBUpokmLGMKNbmvMB48NRnOX5B4re74rCSuhXSMKvtHsQ8Y%2BHEK7c5XY0ud%2FedrLWZRzqvS6VtCfcCufhJgHsmDwmhWDy11dMfgA%3D
+samlrequest: jZJBT+MwFITv/Arr3RPHaVoaqynqLqpAC2pEUg5cVq7rttYmdtbPqeDf402plgMCLr54RjOez7Or57YhR+VQW1MAixMgyki71WZfwLpeRlO4ml/MULRNl/JF7w/mQf3tFXoSnAb56aaA3hluBWrkRrQKuZe8Wtzf8TROeOest9I2QBaIyvmQ9dMa7FvlKuWOWqr1w10BB+875JR2/abRMsbT1cY+R51wHmNpW7rX+xdRVSsg16GDNsIPxc/Wnd62sepZPOgGx7+C9Bhq0Oy3dct2/euG1c6UyZ/73ejgXtyC6m1HES2QpXVSDY8sYCcaVEBurwuQl1KK0VhGGRN5lI1lGuVqGo58kuW5zMYsmwQllgJRH9V/L2Kvbg16YXwBaZJmEWMRS+ok5yPGx5N4mudPQMq3fX5ocxr+szE3JxHym7ouo3JV1UAezwCDAN5wpXyId+84fYFJnOHA/DsowmIz+j4pBNMPPsr8FQ==
+server: Apache/2.4.57 (Unix) OpenSSL/3.0.9
+content-length: 0'
+
+HTTP_REQ="${test_HTTP_REQ}"
 
 echo "HTTP_REQ:
 ${HTTP_REQ}" 1>&2
 
+if [[ -z "${HTTP_REQ}" ]]
+then
+
+    HTTP_REQ:=$(curl \
+		    -s \
+		    -D - \
+		    -A "${USERAGENT}" \
+		    -X POST \
+		    --cookie "${SET_BIGIPSERVER]" \
+		    --cookie "${SET_PSA_COUNTRY}" \
+		    --cookie "${SET_JSESSIONID}" \
+		    -d '' \
+		    "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq" \
+	     )
+   fi
+
 GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/^gigya[uU]rl:[ \t]*\(.*\)$/\1/p' )
-APIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$/\1/p' )
+APIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
 
 while IFS= read -r header
 do
@@ -106,7 +124,7 @@ do
         fi
 done <<< "$HTTP_REQ"
 
-
+exit 1
 
 echo 'Content-type: text/html'
 echo 'RespHead: ABC'
