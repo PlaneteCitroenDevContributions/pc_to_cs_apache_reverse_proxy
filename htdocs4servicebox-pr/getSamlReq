@@ -22,6 +22,28 @@ then
     source "${0}.env.secret"
 fi
 
+urlencode() {
+    # urlencode <string>
+
+    old_lc_collate=$LC_COLLATE
+    LC_COLLATE=C
+
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:$i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-])
+		printf '%s' "$c"
+		;;
+            *)
+		printf '%%%02X' "'$c"
+		;;
+        esac
+    done
+
+    LC_COLLATE=$old_lc_collate
+}
+
 html_log_message () {
     echo "$@" | while read -r line
     do
@@ -75,17 +97,16 @@ IFS="${_old_IFS}"
 
 USERAGENT='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0'
 
-test_HTTP_REQ=':status: 200
-cache-control: no-cache, no-store, max-age=0
-date: Sun, 10 Nov 2024 08:31:56 GMT
-gigyaurl: https://fidm.eu1.gigya.com/saml/v2.0/4_orFmUKH1TrnP0kMf3hryrA/idp/sso
-pc-rproxy-trace: Traffic caught at t=1731227516883954 for dev.servicebox.forumtestplanetecitroen.fr, proto https
-pragma: no-cache
-samllogoutrequest: hZFRa8IwEMff9ylK3tMktUobrCKITKYgm%2B5hLyOpsYa1SZdLi377RZ3gw2Cvd%2Fnd%2F%2B6X8fTU1FGvHGhrCsRiiiJlSrvXpirQbrvAGZpOnsYgmrpN%2BMpWtvOv6rtT4KOAGuC3VoE6Z7gVoIEb0SjgvuRvs%2FWKJzHlrbPelrZG0TyA2gh%2FjTt63wIn5KD3Taw6Fle6Oou4tA25TCV9YEn6ad2i2b08s60zG%2Fq1PgyO7uxmRO9bArVF0XJeoMMwUyJjIywFTXFKM4FlzjIsB2mS5rmUQ5mEl7ARALpXARA1qEsFOrU04IXxBUpokmLGMKNbmvMB48NRnOX5B4re74rCSuhXSMKvtHsQ8Y%2BHEK7c5XY0ud%2FedrLWZRzqvS6VtCfcCufhJgHsmDwmhWDy11dMfgA%3D
-samlrequest: jZJBT+MwFITv/Arr3RPHaVoaqynqLqpAC2pEUg5cVq7rttYmdtbPqeDf402plgMCLr54RjOez7Or57YhR+VQW1MAixMgyki71WZfwLpeRlO4ml/MULRNl/JF7w/mQf3tFXoSnAb56aaA3hluBWrkRrQKuZe8Wtzf8TROeOest9I2QBaIyvmQ9dMa7FvlKuWOWqr1w10BB+875JR2/abRMsbT1cY+R51wHmNpW7rX+xdRVSsg16GDNsIPxc/Wnd62sepZPOgGx7+C9Bhq0Oy3dct2/euG1c6UyZ/73ejgXtyC6m1HES2QpXVSDY8sYCcaVEBurwuQl1KK0VhGGRN5lI1lGuVqGo58kuW5zMYsmwQllgJRH9V/L2Kvbg16YXwBaZJmEWMRS+ok5yPGx5N4mudPQMq3fX5ocxr+szE3JxHym7ouo3JV1UAezwCDAN5wpXyId+84fYFJnOHA/DsowmIz+j4pBNMPPsr8FQ==
-server: Apache/2.4.57 (Unix) OpenSSL/3.0.9
-content-length: 0'
+test_HTTP_REQ='HTTP/1.1 200 
+Cache-control: no-cache, no-store, max-age=0
+Pragma: no-cache
+SAMLRequest: jZJPT+MwFMTvfArr3R3nH7S1mqLuogoEiIike9jLynGc1trEDn5OBd+ebEq1HBBwfjOa8fy8vHzuWnJQDrU1GURBCEQZaWttdhlsyw2dw+XqbImia/uYrwe/N4/qaVDoyeg0yI+XDAZnuBWokRvRKeRe8mJ9f8fjIOS9s95K2wJZIyrnx6yf1uDQKVcod9BSbR/vMth73yNnrB+qVssAj6fKPtNeOI+BtB3b6d2LKIoHIFdjB22En4qfrI2uu0ANUTDpJse/guww1mDpH+s23fb2OiqdycO/902ydy9uzXTdM0QLZGOdVNMjM2hEiwrIzVUGYRLOZKUSWs+SmKaL5pxW9UVI42ZRJ3IuosW8GpWYC0R9UP+9iIO6MeiF8RnEYZzSKKJRWEbnPF3wNA2SePYbSP62zw9tjsN/NmZ1FCG/Lsuc5g9FCeTXCeAogDdcMZ/i3TtOX2ASJziw+g6KcbEle580BrMPPsrqFQ==
+SAMLLogoutRequest: hZFBb8IwDIXv%2BxVV7mmaUto1oiAkhIYG0rTBDrtMaRpKtDbp4rSCf78AQ%2BIwaVfbz8%2Fv82R2bJtgkBaU0QWiYYQCqYWplK4LtNsu8SOaTR8mwNumi9na1KZ3r%2FK7l%2BACL9XArq0C9VYzw0EB07yVwJxgb%2FPNmsVhxDprnBGmQcHCC5Xm7mJ3cK4DRsheVW0oexrWqj7xUJiWnLeSwWtJ8mnsst09P9Gt1S%2FR12Y%2FOtiTnRNVdQQag4LVokBZmmdjLiTmeSpxIiqJyyopcU5TybOSUyFSPwkvHEANskB73oA8V6CXKw2Oa1egOIoTTCmm0ZaOWZKzJAlHcfaBgvcbIn8S%2BgUSs4va3oH4h4M3l%2FacHU1v2bu%2BbJQIfX1QQpbmiDtuHVwhgJmQeydvTP56xfQH
+gigyaUrl: https://fidm.eu1.gigya.com/saml/v2.0/4_orFmUKH1TrnP0kMf3hryrA/idp/sso
+Content-Length: 0
+Date: Sun, 10 Nov 2024 14:49:43 GMT
 
+'
 HTTP_REQ="${test_HTTP_REQ}"
 
 if [[ -z "${HTTP_REQ}" ]]
@@ -105,10 +126,12 @@ then
 fi
 
 echo "==> HTTP_REQ: ${HTTP_REQ}" 1>&2
+echo "${HTTP_REQ}" > /var/pc_debug/HTTP_REQ_getSamlReq.txt
 
 myGIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/^gigya[uU]rl:[ \t]*\(.*\)$/\1/p' )
 myAPIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
 
+set -x
 while IFS= read -r header
 do
         if [[ $header == *"gigyaUrl"* ]]; then
