@@ -1,0 +1,71 @@
+#! /bin/bash
+
+# -*- mode: shell-script -*-
+
+set -e
+
+exec 2>/var/pc_debug/"$( basename "$0" )".log
+
+(
+    echo '==============================='
+    date
+    echo
+    env
+) 1>&2
+
+set -x
+
+HERE=$( dirname "$0" )
+
+if [[ -r "${0}.env.secret" ]]
+then
+    source "${0}.env.secret"
+fi
+
+html_log_message () {
+    echo "$@" | while read -r line
+    do
+       echo "<p>=== ${line} </p>"
+    done
+}
+
+query_string_array_init_val=$(
+
+    IFS='&'
+    set -- ${QUERY_STRING}
+    for i in "$@"
+    do
+       IFS='='
+       set -- $i
+       echo "[$1]=$2"
+    done
+
+)
+eval declare -A query_string_array=( ${query_string_array_init_val} )
+
+echo 'Content-type: text/html'
+echo 'RespHead: ABC'
+echo "Set-Cookie: eee=1"
+echo
+echo '<html>
+<head>
+<title>HELLO cgi</title>
+</head>'
+
+html_log_message "$( date )"
+html_log_message '==================================='
+html_log_message "$(env)"
+html_log_message "Query string array: ${query_string_array[@]}"
+html_log_message "${HTTP_COOKIE}"
+
+cat /tmp/zz.log
+
+echo '</span>
+</span>
+</p>
+
+</body>
+</html>
+'
+
+exit 0
