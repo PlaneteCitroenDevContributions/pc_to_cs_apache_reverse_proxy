@@ -310,6 +310,78 @@ HASGMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*hasGmid=/s/.et-.o
 
 ) 1>&2
 
+#
+# call https://login-ra.fiat.com/accounts.webSdkBootstrap
+# =======================================================
+#
+
+RISKCONTEXT=$( urlencode "{\"b0\":53295,\"b1\":[104,68,180,220],\"b2\":6,\"b3\":[],\"b4\":6,\"b5\":1,\"b6\":\"${USERAGENT}\",\"b7\":[],\"b8\":\"${TIME}:00\",\"b9\":-120,\"b10\":{\"state\":\"prompt\"},\"b11\":false,\"b12\":{\"charging\":true,\"chargingTime\":0,\"dischargingTime\":null,\"level\":1},\"b13\":[null,\"1024|728|24\",false,true]}" )
+
+HTTP_REQ=$(
+    curl \
+	-s \
+	-D - \
+	-A "${USERAGENT}" \
+	-X POST \
+	-d "loginID=${LOGIN}" \
+	-d "password=${PASSWORD}" \
+	-d "sessionExpiration=2628000" \
+	-d "targetEnv=jssdk" \
+	-d "include=profile%2Cdata%2Cemails%2Csubscriptions%2Cpreferences%2C" \
+	-d "includeUserInfo=true" \
+	-d "loginMode=standard" \
+	-d "lang=fr" \
+	-d "riskContext=${RISKCONTEXT}" \
+	-d "APIKey=${APIKEY}" \
+	-d "source=showScreenSet" \
+	-d "sdk=js_latest" \
+	-d "authMode=cookie" \
+	-d "pageURL=https%3A%2F%2Flogin-ra.fiat.com%2F" \
+	-d "sdkBuild=16506" \
+	-d "format=json" \
+	--cookie "${GMID}" \
+	--cookie "${UCID}" \
+	--cookie "${HASGMID}" \
+	'https://login-ra.fiat.com/accounts.login'
+	)
+
+echo "${HTTP_REQ}" > /var/pc_debug/HTTP_REQ_accounts_login.txt
+
+while IFS= read -r header
+do
+        if [[ $header == *"glt_"* ]]; then
+                GLT=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1/i')
+                LOGIN_TOKEN=$(echo $header | sed 's/^Set-Cookie: [^=]*=\([^;]*\);.*$/\1/i')
+        fi
+done <<< "$HTTP_REQ"
+
+(
+    echo "GLT"
+    echo "==> $GLT"
+
+    echo "LOGIN_TOKEN"
+    echo "==> $LOGIN_TOKEN"
+
+) 1>&2
+
+GLT=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*glt_/s/.et-.ookie:[ \t]*\([^;]*;\).*$/\1/p')
+LOGIN_TOKEN=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*glt_/s/.et-.ookie:[ \t]*\([^;]*;\).*$/\1/p')
+
+(
+    echo "GLT"
+    echo "==> $GLT"
+
+    echo "LOGIN_TOKEN"
+    echo "==> $LOGIN_TOKEN"
+
+) 1>&2
+
+if [[ $LOGIN_TOKEN == "" ]]; then
+        echo "Login ERROR"
+        exit 1
+fi
+
+
 exit 1
 
 echo 'Content-type: text/html'
