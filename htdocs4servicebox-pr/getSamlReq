@@ -128,10 +128,6 @@ fi
 echo "==> HTTP_REQ: ${HTTP_REQ}" 1>&2
 echo "${HTTP_REQ}" > /var/pc_debug/HTTP_REQ_getSamlReq.txt
 
-myGIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/^gigya[uU]rl:[ \t]*\(.*\)$/\1/p' )
-myAPIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
-
-set -x
 while IFS= read -r header
 do
         if [[ $header == *"gigyaUrl"* ]]; then
@@ -147,13 +143,84 @@ done <<< "$HTTP_REQ"
 (
     echo "GIGYAURL"
     echo "==> $GIGYAURL"
-    echo "==> $myGIGYAURL"
 
     echo "APIKEY"
     echo $APIKEY
-    echo $myAPIKEY
+
+    echo "SAMLREQUEST"
+    echo "${SAMLREQUEST}"
 ) 1>&2
 
+GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/^gigya[uU]rl:[ \t]*\(.*\)$/\1/p' )
+APIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
+
+SAMLREQUEST=$( echo "${HTTP_REQ}" | sed -n -e '/^SAMLRequest:/s/^SAMLRequest:[ \t]*\(.*\)$/\1/p' )
+SAMLREQUEST_ENCODED=$( urlencode "${SAMLREQUEST}" )
+
+(
+    echo "GIGYAURL"
+    echo "==> $GIGYAURL"
+
+    echo "APIKEY"
+    echo $APIKEY
+
+    echo "SAMLREQUEST"
+    echo "${SAMLREQUEST}"
+) 1>&2
+
+
+#
+# call GIGYAURL
+# =============
+#
+
+
+test_HTTP_REQ='HTTP/2 302 
+content-length: 0
+date: Sun, 10 Nov 2024 15:28:21 GMT
+cache-control: private
+location: https://www.technicalinformation.fiat.com/proxyPage.html?mode=login&samlContext=eu1_352063790294_08cd7025-da4a-497e-bc45-87acfb606d85&spName=POISP
+p3p: CP="IDC COR PSA DEV ADM OUR IND ONL"
+x-error-code: 0
+x-soa: true, Gator
+x-server: eu1a-nomad-t3
+x-callid: 0f03ecb7b0754446b76525c612e21298
+x-robots-tag: none
+
+'
+
+HTTP_REQ="${test_HTTP_REQ}"
+
+: ${HTTP_REQ:=$(
+    curl \
+	-s \
+	-D - \
+	-A "${USERAGENT}" \
+	-X GET "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}"
+	)}
+
+echo "${HTTP_REQ}" > /var/pc_debug/HTTP_REQ_GIGYAURL.txt
+
+while IFS= read -r header
+do
+        if [[ $header == *"samlContext="* ]]; then
+                SAMLCONTEXT=$(echo -n $header | sed 's/.*samlContext=\([^&]*\).*/\1/i')
+        fi
+done <<< "$HTTP_REQ"
+
+(
+    echo "SAMLCONTEXT"
+    echo "==> $SAMLCONTEXT"
+
+) 1>&2
+
+SAMLCONTEXT=$( echo "${HTTP_REQ}" | sed -n -e '/&samlContext=/s/.*&samlContext=\([^&]*\).*/\1/p' )
+
+(
+    echo "SAMLCONTEXT"
+    echo "==> $SAMLCONTEXT"
+
+) 1>&2
 
 exit 1
 
@@ -228,6 +295,8 @@ do
                 SAMLREQUEST_ENCODED=$(urlencode $SAMLREQUEST)
         fi
 done <<< "$HTTP_REQ"
+
+#---------------------------
 
 HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X GET "${GIGYAURL}?SAMLRequest=${SAMLREQUEST_ENCODED}")
 while IFS= read -r header
