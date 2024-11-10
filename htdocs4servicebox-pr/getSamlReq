@@ -79,16 +79,26 @@ HTTP_REQ=$(curl \
 	   -D - \
 	   -A "${USERAGENT}" \
 	   -X POST \
-	   -H "Cookie: ${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} " \
+	   --cookie "${SET_BIGIPSERVER]" \
+	   --cookie "${SET_PSA_COUNTRY]" \
+	   --cookie "${SET_JSESSIONID}" \
 	   -d '' \
 	   "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq" \
 	)
 
+echo "HTTP_REQ:
+${HTTP_REQ}" 1>&2
+
+GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/^gigya[uU]rl:[ \t]*\(.*\)$/\1/p' )
+APIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$/\1/p' )
+
 while IFS= read -r header
 do
-        if [[ $header == *"gigyaUrl"* ]]; then
-                GIGYAURL=$(echo -n $header | sed 's/^gigyaUrl: \(.*\)\r/\1/i')
-                APIKEY=$(echo $header | sed 's/.*v2.0\/\([a-zA-Z0-9\-_]*\)\/.*$/\1/i')
+    case "${header}" in
+	
+        *gigyaUrl*)
+            GIGYAURL=$(echo -n $header | sed 's/^gigyaUrl: \(.*\)\r/\1/i')
+            APIKEY=$(echo $header | sed 's/.*v2.0\/\([a-zA-Z0-9\-_]*\)\/.*$/\1/i')
         fi
         if [[ $header == *"SAMLRequest"* ]]; then
                 SAMLREQUEST=$(echo -n $header | sed 's/^SAMLRequest: \(.*\)\r/\1/i')
@@ -196,8 +206,7 @@ do
         fi
 done <<< "$HTTP_REQ"
 
-HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X GET "https://login-ra.fiat.com/accounts.webSdkBootstrap?apiKey=${APIKEY}&pageURL=${GIGYAURL}?SAMLRequest=$
-{SAMLREQUEST}&sdk=js_latest&sdkBuild=16506&format=json")
+HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X GET "https://login-ra.fiat.com/accounts.webSdkBootstrap?apiKey=${APIKEY}&pageURL=${GIGYAURL}?SAMLRequest=${SAMLREQUEST}&sdk=js_latest&sdkBuild=16506&format=json")
 while IFS= read -r header
 do
         if [[ $header == *"gmid="* ]]; then
@@ -243,7 +252,6 @@ do
         fi
 done <<< "$HTTP_REQ"
 
-HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X POST "${SERVICEBOX_URL}" -d "SAMLResponse=${SAMLRESPONSE_ENCODED}" -H "Cookie: ${JSESSIONID} ${PSACOUNTRY}
- ${BIGIPSERVER} ")
+HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X POST "${SERVICEBOX_URL}" -d "SAMLResponse=${SAMLRESPONSE_ENCODED}" -H "Cookie: ${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} ")
 
 echo "${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} "
