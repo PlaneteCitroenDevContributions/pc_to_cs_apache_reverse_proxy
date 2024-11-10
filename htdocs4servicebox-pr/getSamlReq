@@ -13,7 +13,7 @@ exec 2>/var/pc_debug/"$( basename "$0" )".log
     env
 ) 1>&2
 
-set -x
+#!!!set -x
 
 HERE=$( dirname "$0" )
 
@@ -88,41 +88,49 @@ content-length: 0'
 
 HTTP_REQ="${test_HTTP_REQ}"
 
-echo "HTTP_REQ:
-${HTTP_REQ}" 1>&2
-
 if [[ -z "${HTTP_REQ}" ]]
 then
 
-    HTTP_REQ:=$(curl \
+    HTTP_REQ=$(curl \
 		    -s \
 		    -D - \
 		    -A "${USERAGENT}" \
 		    -X POST \
-		    --cookie "${SET_BIGIPSERVER]" \
+		    --cookie "${SET_BIGIPSERVER}" \
 		    --cookie "${SET_PSA_COUNTRY}" \
-		    --cookie "${SET_JSESSIONID}" \
-		    -d '' \
-		    "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq" \
+ 		    --cookie "${SET_JSESSIONID}" \
+ 		    -d '' \
+ 		    "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq"
 	     )
-   fi
+fi
 
-GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/^gigya[uU]rl:[ \t]*\(.*\)$/\1/p' )
-APIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
+echo "==> HTTP_REQ: ${HTTP_REQ}" 1>&2
+
+myGIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/^gigya[uU]rl:[ \t]*\(.*\)$/\1/p' )
+myAPIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
 
 while IFS= read -r header
 do
-    case "${header}" in
-	
-        *gigyaUrl*)
-            GIGYAURL=$(echo -n $header | sed 's/^gigyaUrl: \(.*\)\r/\1/i')
-            APIKEY=$(echo $header | sed 's/.*v2.0\/\([a-zA-Z0-9\-_]*\)\/.*$/\1/i')
+        if [[ $header == *"gigyaUrl"* ]]; then
+                GIGYAURL=$(echo -n $header | sed 's/^gigyaUrl: \(.*\)\r/\1/i')
+                APIKEY=$(echo $header | sed 's/.*v2.0\/\([a-zA-Z0-9\-_]*\)\/.*$/\1/i')
         fi
         if [[ $header == *"SAMLRequest"* ]]; then
                 SAMLREQUEST=$(echo -n $header | sed 's/^SAMLRequest: \(.*\)\r/\1/i')
                 SAMLREQUEST_ENCODED=$(urlencode $SAMLREQUEST)
         fi
 done <<< "$HTTP_REQ"
+
+(
+    echo "GIGYAURL"
+    echo "==> $GIGYAURL"
+    echo "==> $myGIGYAURL"
+
+    echo "APIKEY"
+    echo $APIKEY
+    echo $myAPIKEY
+) 1>&2
+
 
 exit 1
 
