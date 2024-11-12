@@ -10,7 +10,17 @@ then
     mkdir -p "${TRACE_DIR}"
 fi
 
-exec 2>"${TRACE_DIR}/stderr.log"
+if [[ -n "${DO_NO_REDIRECT_STDERR}" ]]
+then
+    _redirect_stderr=false
+else
+    _redirect_stderr=true
+fi
+
+if ${_redirect_stderr}
+then
+    exec 2>"${TRACE_DIR}/stderr.log"
+fi
 
 trace ()
 {
@@ -241,10 +251,14 @@ done <<< "$HTTP_REQ"
 
 trace "His SAMLCONTEXT: ${SAMLCONTEXT}"
 
+set -x
+
 _locationHeader=$( echo "${HTTP_REQ}" | getHeaderValueFor 'location' )
-SAMLCONTEXT=$( echo "${locationHeader}" | sed -n -e '/&samlContext=/s/.*&samlContext=\([^&]*\).*/\1/p' )
+SAMLCONTEXT=$( echo "${_locationHeader}" | sed -n -e 's/.*&samlContext=\([^&]*\).*/\1/p' )
 
 trace "My SAMLCONTEXT: ${SAMLCONTEXT}"
+
+exit 1
 
 #
 # call https://login-ra.fiat.com/accounts.webSdkBootstrap
