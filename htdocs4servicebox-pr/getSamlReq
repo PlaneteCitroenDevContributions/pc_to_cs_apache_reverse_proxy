@@ -213,8 +213,9 @@ APIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
 
 SAMLREQUEST=$( echo "${HTTP_REQ}" | sed -n -e '/^SAMLRequest:/s/^SAMLRequest:[ \t]*\(.*\)$/\1/p' )
 SAMLREQUEST=$( echo "${HTTP_REQ}" | getHeaderValueFor 'SAMLRequest' )
-
 SAMLREQUEST_ENCODED=$( urlencode "${SAMLREQUEST}" )
+
+SAMLLOGOUTREQUEST=$( echo "${HTTP_REQ}" | getHeaderValueFor 'SAMLLogoutRequest' )
 
 trace "My GIGYAURL: ${GIGYAURL}"
 trace "My APIKEY: ${APIKEY}"
@@ -522,14 +523,43 @@ LOGIN_TOKEN=$(echo "${GLT}" | sed -n -e 's/[^=]*=//p')
 trace "My GLT: $GLT"
 trace "My LOGIN_TOKEN: $LOGIN_TOKEN"
 
-if [[ $LOGIN_TOKEN == "" ]]; then
-        echo "Login ERROR"
-        exit 1
+if [[ "${LOGIN_TOKEN}" == "" ]]
+then
+
+    #
+    # build and error content
+    # not yet implemented
+    #
+
+    echo "Login ERROR"
+    exit 1
+else
+
+    echo 'SAMLRequest: '"${SAMLREQUEST}"
+    echo 'SAMLLogoutRequest: '"${SAMLLOGOUTREQUEST}"
+    echo 'gigyaUrl: '"${GIGYAURL}"
+    echo
+
+    exit 0
 fi
+
+
+
+#
+# ============================================
+#
+# OLD CODE
+#
+# NOT REACHED
+#
 
 exit 1
 
-echo 'Content-type: text/html'
+
+
+
+
+
 echo 'RespHead: ABC'
 echo "Set-Cookie: eee=1"
 echo
