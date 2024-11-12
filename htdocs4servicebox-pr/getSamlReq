@@ -258,14 +258,12 @@ SAMLCONTEXT=$( echo "${_locationHeader}" | sed -n -e 's/.*&samlContext=\([^&]*\)
 
 trace "My SAMLCONTEXT: ${SAMLCONTEXT}"
 
-exit 1
-
 #
 # call https://login-ra.fiat.com/accounts.webSdkBootstrap
 # =======================================================
 #
 
-test_HTTP_REQ='HTTP/2 200 
+_test_HTTP_REQ='HTTP/2 200 
 content-type: text/javascript; charset=utf-8
 content-length: 199
 date: Sun, 10 Nov 2024 15:50:38 GMT
@@ -295,7 +293,7 @@ x-amz-cf-id: 78A3H2gltQxEGemmu0dbfe0vS0b1Hmje9eP7JC7tfIQdb3n7nBYPkQ==
 }
 '
 
-HTTP_REQ="${test_HTTP_REQ}"
+HTTP_REQ="${_test_HTTP_REQ}"
 
 : ${HTTP_REQ:=$(
     curl \
@@ -305,7 +303,7 @@ HTTP_REQ="${test_HTTP_REQ}"
 	-X GET 'https://login-ra.fiat.com/accounts.webSdkBootstrap?apiKey='"${APIKEY}"'&pageURL='"${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST}"'&sdk=js_latest&sdkBuild=16506&format=json'
 	)}
 
-echo "${HTTP_REQ}" > /var/pc_debug/HTTP_REQ_webSdkBootstrap.txt
+echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_webSdkBootstrap.txt"
 
 while IFS= read -r header
 do
@@ -320,33 +318,17 @@ do
         fi
 done <<< "$HTTP_REQ"
 
-(
-    echo "GMID"
-    echo "==> $GMID"
-
-    echo "UCID"
-    echo "==> $UCID"
-
-    echo "HASGMID"
-    echo "==> $HASGMID"
-
-) 1>&2
+trace "His GMID: $GMID"
+trace "His UCID: $UCID"
+trace "His HASGMID: $HASGMID"
 
 GMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*gmid=/s/.et-.ookie:[ \t]*\([^;]*;\).*$/\1/p')
 UCID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*ucid=/s/.et-.ookie:[ \t]*\([^;]*;\).*$/\1/p')
 HASGMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*hasGmid=/s/.et-.ookie:[ \t]*\([^;]*;\).*$/\1/p')
 
-(
-    echo "GMID"
-    echo "==> $GMID"
-
-    echo "UCID"
-    echo "==> $UCID"
-
-    echo "HASGMID"
-    echo "==> $HASGMID"
-
-) 1>&2
+trace "My GMID: $GMID"
+trace "My UCID: $UCID"
+trace "My HASGMID: $HASGMID"
 
 #
 # call https://login-ra.fiat.com/accounts.webSdkBootstrap
