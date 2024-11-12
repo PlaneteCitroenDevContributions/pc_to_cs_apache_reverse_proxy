@@ -69,6 +69,23 @@ query_string_array_init_val=$(
     done
 
 )
+
+#
+# global definitions
+#
+
+: ${PUBLIC_SERVICE_BOX_ROOT_URL:='https://public.servicebox-parts.com/'}
+
+if [[ -z "${HTTP_USER_AGENT}" ]]
+then
+    USERAGENT='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0'
+else
+    USERAGENT="${HTTP_USER_AGENT}"
+fi
+
+
+
+
 eval declare -A query_string_array=( ${query_string_array_init_val} )
 
 #
@@ -98,10 +115,6 @@ do
     esac
 done
 IFS="${_old_IFS}"
-
-: ${PUBLIC_SERVICE_BOX_ROOT_URL:='https://public.servicebox-parts.com/'}
-
-USERAGENT='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0'
 
 test_HTTP_REQ='HTTP/1.1 200 
 Cache-control: no-cache, no-store, max-age=0
