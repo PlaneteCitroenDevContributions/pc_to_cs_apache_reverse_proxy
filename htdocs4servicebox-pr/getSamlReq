@@ -167,7 +167,7 @@ HTTP_REQ="${_test_HTTP_REQ}"
 	     )}
 
 trace "==> HTTP_REQ: ${HTTP_REQ}"
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_getSamlReq_response.txt
+echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_getSamlReq_response.txt"
 
 while IFS= read -r header
 do
@@ -179,7 +179,7 @@ do
                 SAMLREQUEST=$(echo -n $header | sed 's/^SAMLRequest: \(.*\)\r/\1/i')
                 SAMLREQUEST_ENCODED=$(urlencode $SAMLREQUEST)
         fi
-done <<< "$HTTP_REQ"
+done <<< "${HTTP_REQ}"
 
 (
     echo "GIGYAURL"
@@ -193,6 +193,7 @@ done <<< "$HTTP_REQ"
 ) 1>&2
 
 GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/[^:]*:[ \t]*\(.*\)$/\1/p' )
+
 GIGYAURL=$( getHeaderValue 'gigyaUrl' )
 
 APIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
