@@ -181,16 +181,9 @@ do
         fi
 done <<< "${HTTP_REQ}"
 
-(
-    echo "GIGYAURL"
-    echo "==> $GIGYAURL"
-
-    echo "APIKEY"
-    echo $APIKEY
-
-    echo "SAMLREQUEST"
-    echo "${SAMLREQUEST}"
-) 1>&2
+trace "His GIGYAURL: ${GIGYAURL}"
+trace "His APIKEY: ${APIKEY}"
+trace "His SAMLREQUEST: ${SAMLREQUEST}"
 
 GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/[^:]*:[ \t]*\(.*\)$/\1/p' )
 
@@ -203,22 +196,9 @@ SAMLREQUEST=$( echo "${HTTP_REQ}" | getHeaderValueFor 'SAMLRequest' )
 
 SAMLREQUEST_ENCODED=$( urlencode "${SAMLREQUEST}" )
 
-
-
-
-
-(
-    echo "GIGYAURL"
-    echo "==> $GIGYAURL"
-
-    echo "APIKEY"
-    echo $APIKEY
-
-    echo "SAMLREQUEST"
-    echo "${SAMLREQUEST}"
-) 1>&2
-
-exit 1
+trace "My GIGYAURL: ${GIGYAURL}"
+trace "My APIKEY: ${APIKEY}"
+trace "My SAMLREQUEST: ${SAMLREQUEST}"
 
 #
 # call GIGYAURL
@@ -226,7 +206,7 @@ exit 1
 #
 
 
-test_HTTP_REQ='HTTP/2 302 
+_test_HTTP_REQ='HTTP/2 302 
 content-length: 0
 date: Sun, 10 Nov 2024 15:28:21 GMT
 cache-control: private
@@ -240,7 +220,7 @@ x-robots-tag: none
 
 '
 
-HTTP_REQ="${test_HTTP_REQ}"
+HTTP_REQ="${_test_HTTP_REQ}"
 
 : ${HTTP_REQ:=$(
     curl \
@@ -250,7 +230,7 @@ HTTP_REQ="${test_HTTP_REQ}"
 	-X GET "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}"
 	)}
 
-echo "${HTTP_REQ}" > /var/pc_debug/HTTP_REQ_GIGYAURL.txt
+echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL.txt"
 
 while IFS= read -r header
 do
@@ -259,19 +239,12 @@ do
         fi
 done <<< "$HTTP_REQ"
 
-(
-    echo "SAMLCONTEXT"
-    echo "==> $SAMLCONTEXT"
+trace "His SAMLCONTEXT: ${SAMLCONTEXT}"
 
-) 1>&2
+_locationHeader=$( echo "${HTTP_REQ}" | getHeaderValueFor 'location' )
+SAMLCONTEXT=$( echo "${locationHeader}" | sed -n -e '/&samlContext=/s/.*&samlContext=\([^&]*\).*/\1/p' )
 
-SAMLCONTEXT=$( echo "${HTTP_REQ}" | sed -n -e '/&samlContext=/s/.*&samlContext=\([^&]*\).*/\1/p' )
-
-(
-    echo "SAMLCONTEXT"
-    echo "==> $SAMLCONTEXT"
-
-) 1>&2
+trace "My SAMLCONTEXT: ${SAMLCONTEXT}"
 
 #
 # call https://login-ra.fiat.com/accounts.webSdkBootstrap
