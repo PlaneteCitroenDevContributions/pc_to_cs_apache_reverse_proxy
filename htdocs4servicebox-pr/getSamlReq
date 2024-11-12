@@ -4,7 +4,13 @@
 
 set -e
 
-exec 2>/var/pc_debug/"$( basename "$0" )".log
+: ${TRACE_DIR:="/var/pc_debug/$( basename "$0" )_$$"}
+if [[ ! -d "${TRACE_DIR}" ]]
+then
+    mkdir -p "${TRACE_DIR}"
+fi
+
+exec 2>"${TRACE_DIR}/stderr.log"
 
 (
     echo '==============================='
