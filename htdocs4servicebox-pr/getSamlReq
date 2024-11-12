@@ -251,8 +251,6 @@ done <<< "$HTTP_REQ"
 
 trace "His SAMLCONTEXT: ${SAMLCONTEXT}"
 
-set -x
-
 _locationHeader=$( echo "${HTTP_REQ}" | getHeaderValueFor 'location' )
 SAMLCONTEXT=$( echo "${_locationHeader}" | sed -n -e 's/.*&samlContext=\([^&]*\).*/\1/p' )
 
@@ -336,7 +334,7 @@ trace "My HASGMID: $HASGMID"
 #
 
 
-test_HTTP_REQ='HTTP/2 200 
+_test_HTTP_REQ='HTTP/2 200 
 content-type: text/javascript; charset=utf-8
 content-length: 3311
 date: Sun, 10 Nov 2024 16:20:15 GMT
@@ -457,9 +455,11 @@ x-amz-cf-id: oTR5vezUOqJ9A8aBXCshVT-5oD_wPLMBcuggCoXwT2oPKX8u68702w==
 }
 '
 
-HTTP_REQ="${test_HTTP_REQ}"
+HTTP_REQ="${_test_HTTP_REQ}"
 
-RISKCONTEXT=$( urlencode "{\"b0\":53295,\"b1\":[104,68,180,220],\"b2\":6,\"b3\":[],\"b4\":6,\"b5\":1,\"b6\":\"${USERAGENT}\",\"b7\":[],\"b8\":\"${TIME}:00\",\"b9\":-120,\"b10\":{\"state\":\"prompt\"},\"b11\":false,\"b12\":{\"charging\":true,\"chargingTime\":0,\"dischargingTime\":null,\"level\":1},\"b13\":[null,\"1024|728|24\",false,true]}" )
+RISKCONTEXT=$( urlencode '{"b0":53295,"b1":[104,68,180,220],"b2":6,"b3":[],"b4":6,"b5":1,"b6":"'"${USERAGENT}"'","b7":[],"b8":"'"${TIME}"':00","b9":-120,"b10":{"state":"prompt"},"b11":false,"b12":{"charging":true,"chargingTime":0,"dischargingTime":null,"level":1},"b13":[null,"1024|728|24",false,true]}' )
+
+trace "RISKCONTEXT: ${RISKCONTEXT}"
 
 : ${HTTP_REQ:=$(
     curl \
@@ -489,7 +489,7 @@ RISKCONTEXT=$( urlencode "{\"b0\":53295,\"b1\":[104,68,180,220],\"b2\":6,\"b3\":
 	'https://login-ra.fiat.com/accounts.login'
 	)}
 
-echo "${HTTP_REQ}" > /var/pc_debug/HTTP_REQ_accounts_login.txt
+echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_accounts_login.txt"
 
 while IFS= read -r header
 do
@@ -499,34 +499,19 @@ do
         fi
 done <<< "$HTTP_REQ"
 
-(
-    echo "His"
-    echo "GLT"
-    echo "==> $GLT"
-
-    echo "LOGIN_TOKEN"
-    echo "==> $LOGIN_TOKEN"
-
-) 1>&2
+trace "His GLT: $GLT"
+trace "His LOGIN_TOKEN: $LOGIN_TOKEN"
 
 GLT=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*glt_/s/.*\(glt_[^;]*\).*/\1/p')
 LOGIN_TOKEN=$(echo "${GLT}" | sed -n -e 's/[^=]*=//p')
 
-(
-    echo "Mine"
-    echo "GLT"
-    echo "==> $GLT"
-
-    echo "LOGIN_TOKEN"
-    echo "==> $LOGIN_TOKEN"
-
-) 1>&2
+trace "My GLT: $GLT"
+trace "My LOGIN_TOKEN: $LOGIN_TOKEN"
 
 if [[ $LOGIN_TOKEN == "" ]]; then
         echo "Login ERROR"
         exit 1
 fi
-
 
 exit 1
 
