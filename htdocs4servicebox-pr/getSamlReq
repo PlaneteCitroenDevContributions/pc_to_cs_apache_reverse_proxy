@@ -67,7 +67,7 @@ getHeaderValueFor ()
 
     header_value=$(
 	echo "${line_containing_header}" | \
-	    sed -n -e '/s/[^:]*:[ \t]*\(.*\)$/\1/p'
+	    sed -n -e 's/[^:]*:[ \t]*\(.*\)$/\1/p'
 		)
 
     echo "${header_value}"
@@ -218,6 +218,7 @@ SAMLREQUEST_ENCODED=$( urlencode "${SAMLREQUEST}" )
     echo "${SAMLREQUEST}"
 ) 1>&2
 
+exit 1
 
 #
 # call GIGYAURL
