@@ -55,7 +55,7 @@ urlencode() {
     LC_COLLATE=$old_lc_collate
 }
 
-getHeaderValue ()
+getHeaderValueFor ()
 {
     header_regexpr_pattern="$1"
 
@@ -194,12 +194,12 @@ done <<< "${HTTP_REQ}"
 
 GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/[^:]*:[ \t]*\(.*\)$/\1/p' )
 
-GIGYAURL=$( getHeaderValue 'gigyaUrl' )
+GIGYAURL=$( echo "${HTTP_REQ}" | getHeaderValueFor 'gigyaUrl' )
 
 APIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
 
 SAMLREQUEST=$( echo "${HTTP_REQ}" | sed -n -e '/^SAMLRequest:/s/^SAMLRequest:[ \t]*\(.*\)$/\1/p' )
-SAMLREQUEST=$( getHeaderValue 'SAMLRequest' )
+SAMLREQUEST=$( echo "${HTTP_REQ}" | getHeaderValueFor 'SAMLRequest' )
 
 SAMLREQUEST_ENCODED=$( urlencode "${SAMLREQUEST}" )
 
