@@ -12,12 +12,17 @@ fi
 
 exec 2>"${TRACE_DIR}/stderr.log"
 
-(
-    echo '==============================='
-    date
-    echo
-    env
-) 1>&2
+trace ()
+{
+    echo "$@" | while read -r line
+    do
+       echo '===> '"${line}" 1>&2
+    done
+}
+
+trace '==============================='
+trace "$( date )"
+trace "$( env )"
 
 #!!!set -x
 
@@ -49,6 +54,25 @@ urlencode() {
 
     LC_COLLATE=$old_lc_collate
 }
+
+getHeaderValue ()
+{
+    header_regexpr_pattern="$1"
+
+    line_containing_header=$(
+	grep \
+	    --ignore-case \
+	    --regexp="${header_regexpr_pattern}:"
+			 )
+
+    header_value=$(
+	echo "${line_containing_header}" | \
+	    sed -n -e '/s/[^:]*:[ \t]*\(.*\)$/\1/p'
+		)
+
+    echo "${header_value}"
+}
+
 
 html_log_message () {
     echo "$@" | while read -r line
@@ -83,13 +107,15 @@ else
     USERAGENT="${HTTP_USER_AGENT}"
 fi
 
-
-
-
 eval declare -A query_string_array=( ${query_string_array_init_val} )
 
 #
+# Starts to get all params whith the aim to login in
+#
+
+#
 # get SAML Auth
+# -------------
 #
 
 # get JSESSIONID PSACOUNTRY & BIGIPSERVER cookies
@@ -116,7 +142,7 @@ do
 done
 IFS="${_old_IFS}"
 
-test_HTTP_REQ='HTTP/1.1 200 
+_test_HTTP_REQ='HTTP/1.1 200 
 Cache-control: no-cache, no-store, max-age=0
 Pragma: no-cache
 SAMLRequest: jZJPT+MwFMTvfArr3R3nH7S1mqLuogoEiIike9jLynGc1trEDn5OBd+ebEq1HBBwfjOa8fy8vHzuWnJQDrU1GURBCEQZaWttdhlsyw2dw+XqbImia/uYrwe/N4/qaVDoyeg0yI+XDAZnuBWokRvRKeRe8mJ9f8fjIOS9s95K2wJZIyrnx6yf1uDQKVcod9BSbR/vMth73yNnrB+qVssAj6fKPtNeOI+BtB3b6d2LKIoHIFdjB22En4qfrI2uu0ANUTDpJse/guww1mDpH+s23fb2OiqdycO/902ydy9uzXTdM0QLZGOdVNMjM2hEiwrIzVUGYRLOZKUSWs+SmKaL5pxW9UVI42ZRJ3IuosW8GpWYC0R9UP+9iIO6MeiF8RnEYZzSKKJRWEbnPF3wNA2SePYbSP62zw9tjsN/NmZ1FCG/Lsuc5g9FCeTXCeAogDdcMZ/i3TtOX2ASJziw+g6KcbEle580BrMPPsrqFQ==
@@ -126,12 +152,9 @@ Content-Length: 0
 Date: Sun, 10 Nov 2024 14:49:43 GMT
 
 '
-HTTP_REQ="${test_HTTP_REQ}"
+HTTP_REQ="${_test_HTTP_REQ}"
 
-if [[ -z "${HTTP_REQ}" ]]
-then
-
-    HTTP_REQ=$(curl \
+: ${HTTP_REQ:=$(curl \
 		    -s \
 		    -D - \
 		    -A "${USERAGENT}" \
@@ -141,11 +164,10 @@ then
  		    --cookie "${SET_JSESSIONID}" \
  		    -d '' \
  		    "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq"
-	     )
-fi
+	     )}
 
-echo "==> HTTP_REQ: ${HTTP_REQ}" 1>&2
-echo "${HTTP_REQ}" > /var/pc_debug/HTTP_REQ_getSamlReq.txt
+trace "==> HTTP_REQ: ${HTTP_REQ}"
+echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_getSamlReq_response.txt
 
 while IFS= read -r header
 do
@@ -170,11 +192,19 @@ done <<< "$HTTP_REQ"
     echo "${SAMLREQUEST}"
 ) 1>&2
 
-GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/^gigya[uU]rl:[ \t]*\(.*\)$/\1/p' )
+GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/[^:]*:[ \t]*\(.*\)$/\1/p' )
+GIGYAURL=$( getHeaderValue 'gigyaUrl' )
+
 APIKEY=$( echo "${GIGYAURL}" | sed -n -e 's|.*/v2.0/\([^/]*\)/.*$|\1|p' )
 
 SAMLREQUEST=$( echo "${HTTP_REQ}" | sed -n -e '/^SAMLRequest:/s/^SAMLRequest:[ \t]*\(.*\)$/\1/p' )
+SAMLREQUEST=$( getHeaderValue 'SAMLRequest' )
+
 SAMLREQUEST_ENCODED=$( urlencode "${SAMLREQUEST}" )
+
+
+
+
 
 (
     echo "GIGYAURL"
