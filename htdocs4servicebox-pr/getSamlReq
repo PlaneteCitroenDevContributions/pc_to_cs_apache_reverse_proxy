@@ -2,7 +2,12 @@
 
 # -*- mode: shell-script -*-
 
-set -e
+#!!!! set -e
+
+if [[ -r "${0}.env.secret" ]]
+then
+    source "${0}.env.secret"
+fi
 
 : ${TRACE_DIR:="/var/pc_debug/$( basename "$0" )_$$"}
 if [[ ! -d "${TRACE_DIR}" ]]
@@ -44,11 +49,6 @@ trace "$( env )"
 #!!!set -x
 
 HERE=$( dirname "$0" )
-
-if [[ -r "${0}.env.secret" ]]
-then
-    source "${0}.env.secret"
-fi
 
 urlencode() {
     # urlencode <string>
@@ -173,7 +173,7 @@ Date: Sun, 10 Nov 2024 14:49:43 GMT
 '
 else
 
-    HTTP_REQ=$(curl \
+    HTTP_REQ=$( curl \
 		    -s \
 		    -D - \
 		    -A "${USERAGENT}" \
@@ -243,13 +243,27 @@ x-robots-tag: none
 
 '
 else
-    HTTP_REQ=$(
-    curl \
-	-s \
-	-D - \
-	-A "${USERAGENT}" \
-	-X GET "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}"
+    # FIXME: strange behaviour
+
+    trace "call GIGYAURL: ${GIGYAURL}"
+    set -vx
+    trace "TTTT${GIGYAURL}XXXXX" "${GIGYAURL}"
+    #'?SAMLRequest=' "${SAMLREQUEST_ENCODED}"
+
+    trace curl \
+	  -s \
+		    -D - \
+		    -A "${USERAGENT}" \
+		    -X GET \
+		    "TTTT${GIGYAURL}XXXXX"'?SAMLRequest='"${SAMLREQUEST_ENCODED}"
+    HTTP_REQ=$(	curl \
+		    -s \
+		    -D - \
+		    -A "${USERAGENT}" \
+		    -X GET \
+		    "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}"
 	    )
+    trace 'call GIGYAURL DONE'
 fi
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL.txt"
