@@ -531,13 +531,17 @@ then
     # not yet implemented
     #
 
-    echo "Login ERROR"
-    exit 1
+    echo 'Status: 500 Internal Server Error'
+    echo
+    
+    exit 0
 else
 
     echo 'SAMLRequest: '"${SAMLREQUEST}"
     echo 'SAMLLogoutRequest: '"${SAMLLOGOUTREQUEST}"
     echo 'gigyaUrl: '"${GIGYAURL}"
+    echo 'Location: /do/newApvprStart'
+    echo 'Status: 301 Moved Permanently'
     echo
 
     exit 0
