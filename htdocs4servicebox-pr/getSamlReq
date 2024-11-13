@@ -46,8 +46,6 @@ trace '==============================='
 trace "$( date )"
 trace "$( env )"
 
-#!!!set -x
-
 HERE=$( dirname "$0" )
 
 urlencode() {
@@ -245,33 +243,20 @@ x-robots-tag: none
 
 '
 else
-    # FIXME: strange behaviour
-
-    trace "call GIGYAURL: ${GIGYAURL}"
-    set -vx
-    trace "TTTT${GIGYAURL}XXXXX" "${GIGYAURL}"
-    #'?SAMLRequest=' "${SAMLREQUEST_ENCODED}"
-
-    trace curl \
-	  -s \
-		    -D - \
-		    -A "${USERAGENT}" \
-		    -X GET \
-		    "TTTT${GIGYAURL}XXXXX"'?SAMLRequest='"${SAMLREQUEST_ENCODED}"
     HTTP_REQ=$(	curl \
 		    -s \
 		    -D - \
 		    -A "${USERAGENT}" \
 		    -X GET \
+		    --location --max-redirs 10 \
 		    "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}" \
 		    | \
 		    sed -e 's/\r$//'
 
 	    )
-    trace 'call GIGYAURL DONE'
 fi
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL.txt"
+echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL_response.txt"
 
 while IFS= read -r header
 do
@@ -325,16 +310,17 @@ x-amz-cf-id: 78A3H2gltQxEGemmu0dbfe0vS0b1Hmje9eP7JC7tfIQdb3n7nBYPkQ==
 '
 else
 
-    HTTP_REQ=$(
-    curl \
-	-s \
-	-D - \
-	-A "${USERAGENT}" \
-	-X GET 'https://login-ra.fiat.com/accounts.webSdkBootstrap?apiKey='"${APIKEY}"'&pageURL='"${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST}"'&sdk=js_latest&sdkBuild=16506&format=json'
+    HTTP_REQ=$( curl \
+		    -s \
+		    -D - \
+		    -A "${USERAGENT}" \
+		    -X GET 'https://login-ra.fiat.com/accounts.webSdkBootstrap?apiKey='"${APIKEY}"'&pageURL='"${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST}"'&sdk=js_latest&sdkBuild=16506&format=json' \
+		    | \
+		    sed -e 's/\r$//'
 	    )
 fi
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_webSdkBootstrap.txt"
+echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_webSdkBootstrap_response.txt"
 
 while IFS= read -r header
 do
