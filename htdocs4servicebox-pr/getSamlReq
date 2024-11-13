@@ -182,7 +182,9 @@ else
 		    --cookie "${SET_PSA_COUNTRY}" \
  		    --cookie "${SET_JSESSIONID}" \
  		    -d '' \
- 		    "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq"
+ 		    "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq" \
+		    | \
+		    sed -e 's/\r$//'
 	    )
 fi
 
@@ -261,7 +263,10 @@ else
 		    -D - \
 		    -A "${USERAGENT}" \
 		    -X GET \
-		    "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}"
+		    "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}" \
+		    | \
+		    sed -e 's/\r$//'
+
 	    )
     trace 'call GIGYAURL DONE'
 fi
