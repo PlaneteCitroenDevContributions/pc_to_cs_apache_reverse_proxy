@@ -523,13 +523,11 @@ done <<< "$HTTP_REQ"
 trace "His GLT: $GLT"
 trace "His LOGIN_TOKEN: $LOGIN_TOKEN"
 
-GLT=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*glt_/s/.*\(glt_[^;]*\).*/\1/p')
+GLT=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*glt_/s/.*\(glt_[^;]*\);.*/\1/p')
 LOGIN_TOKEN=$(echo "${GLT}" | sed -n -e 's/[^=]*=//p')
 
 trace "My GLT: $GLT"
 trace "My LOGIN_TOKEN: $LOGIN_TOKEN"
-
-exit 1
 
 if [[ "${LOGIN_TOKEN}" == "" ]]
 then
@@ -542,6 +540,7 @@ then
     echo 'Status: 500 Internal Server Error'
     echo
     
+    trace 'Return code 500'
     exit 0
 else
 
@@ -552,10 +551,11 @@ else
     echo 'Status: 301 Moved Permanently'
     echo
 
+    trace "Return code 301 with LoginToken: ${LOGIN_TOKEN}"
     exit 0
 fi
 
-
+# NOT REACHED
 
 #
 # ============================================
