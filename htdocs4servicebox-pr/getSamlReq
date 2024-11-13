@@ -157,6 +157,11 @@ do
 done
 IFS="${_old_IFS}"
 
+trace "Has SET_JSESSIONID: ${SET_JSESSIONID}"
+trace "Has SET_PSA_COUNTRY: ${SET_PSA_COUNTRY}"
+trace "Has SET_BIGIPSERVER: ${SET_BIGIPSERVER}"
+
+
 if ${_useTestFrames}
 then
     HTTP_REQ='HTTP/1.1 200 
@@ -547,8 +552,11 @@ else
     echo 'SAMLRequest: '"${SAMLREQUEST}"
     echo 'SAMLLogoutRequest: '"${SAMLLOGOUTREQUEST}"
     echo 'gigyaUrl: '"${GIGYAURL}"
-    echo 'Location: /do/newApvprStart'
+    echo "debug_login_token: ${LOGIN_TOKEN}"
     echo 'Status: 301 Moved Permanently'
+    echo 'Location: /do/newApvprStart'
+#!!!    echo 'Location: /socle/?start=true'
+#!!    echo 'Location: https://dev.servicebox.forumtestplanetecitroen.fr/'
     echo
 
     trace "Return code 301 with LoginToken: ${LOGIN_TOKEN}"
