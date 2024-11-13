@@ -555,6 +555,7 @@ else
     echo "debug_login_token: ${LOGIN_TOKEN}"
     echo 'Status: 301 Moved Permanently'
     echo 'Location: /do/newApvprStart'
+    echo "Set-Cookie: ${HTTP_COOKIE}"
 #!!!    echo 'Location: /socle/?start=true'
 #!!    echo 'Location: https://dev.servicebox.forumtestplanetecitroen.fr/'
     echo
