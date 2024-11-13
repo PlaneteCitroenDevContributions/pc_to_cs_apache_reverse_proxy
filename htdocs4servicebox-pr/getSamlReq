@@ -339,9 +339,9 @@ trace "His GMID: $GMID"
 trace "His UCID: $UCID"
 trace "His HASGMID: $HASGMID"
 
-GMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*gmid=/s/.et-.ookie:[ \t]*\([^;]*;\).*$/\1/p')
-UCID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*ucid=/s/.et-.ookie:[ \t]*\([^;]*;\).*$/\1/p')
-HASGMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*hasGmid=/s/.et-.ookie:[ \t]*\([^;]*;\).*$/\1/p')
+GMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*gmid=/s/[^=]*=\([^;]*\);.*$/\1/p')
+UCID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*ucid=/s/[^=]*=\([^;]*\);.*$/\1/p')
+HASGMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*has[gG]mid=/s/[^=]*=\([^;]*\);.*$/\1/p')
 
 trace "My GMID: $GMID"
 trace "My UCID: $UCID"
@@ -480,36 +480,37 @@ x-amz-cf-id: oTR5vezUOqJ9A8aBXCshVT-5oD_wPLMBcuggCoXwT2oPKX8u68702w==
 '
 else
 
-    HTTP_REQ=$(
-    curl \
-	-s \
-	-D - \
-	-A "${USERAGENT}" \
-	-X POST \
-	-d "loginID=${LOGIN}" \
-	-d "password=${PASSWORD}" \
-	-d "sessionExpiration=2628000" \
-	-d "targetEnv=jssdk" \
-	-d "include=profile%2Cdata%2Cemails%2Csubscriptions%2Cpreferences%2C" \
-	-d "includeUserInfo=true" \
-	-d "loginMode=standard" \
-	-d "lang=fr" \
-	-d "riskContext=${RISKCONTEXT}" \
-	-d "APIKey=${APIKEY}" \
-	-d "source=showScreenSet" \
-	-d "sdk=js_latest" \
-	-d "authMode=cookie" \
-	-d "pageURL=https%3A%2F%2Flogin-ra.fiat.com%2F" \
-	-d "sdkBuild=16506" \
-	-d "format=json" \
-	--cookie "${GMID}" \
-	--cookie "${UCID}" \
-	--cookie "${HASGMID}" \
-	'https://login-ra.fiat.com/accounts.login'
+    HTTP_REQ=$( curl \
+		    -s \
+		    -D - \
+		    -A "${USERAGENT}" \
+		    -X POST \
+		    -d "loginID=${LOGIN}" \
+		    -d "password=${PASSWORD}" \
+		    -d "sessionExpiration=2628000" \
+		    -d "targetEnv=jssdk" \
+		    -d "include=profile%2Cdata%2Cemails%2Csubscriptions%2Cpreferences%2C" \
+		    -d "includeUserInfo=true" \
+		    -d "loginMode=standard" \
+		    -d "lang=fr" \
+		    -d "riskContext=${RISKCONTEXT}" \
+		    -d "APIKey=${APIKEY}" \
+		    -d "source=showScreenSet" \
+		    -d "sdk=js_latest" \
+		    -d "authMode=cookie" \
+		    -d "pageURL=https%3A%2F%2Flogin-ra.fiat.com%2F" \
+		    -d "sdkBuild=16506" \
+		    -d "format=json" \
+		    --cookie "gmid=${GMID}" \
+		    --cookie "ucid=${UCID}" \
+		    --cookie "hasGmid=${HASGMID}" \
+		    'https://login-ra.fiat.com/accounts.login' \
+		    | \
+		    sed -e 's/\r$//'
 	    )
 fi
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_accounts_login.txt"
+echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_accounts_login_response.txt"
 
 while IFS= read -r header
 do
@@ -527,6 +528,8 @@ LOGIN_TOKEN=$(echo "${GLT}" | sed -n -e 's/[^=]*=//p')
 
 trace "My GLT: $GLT"
 trace "My LOGIN_TOKEN: $LOGIN_TOKEN"
+
+exit 1
 
 if [[ "${LOGIN_TOKEN}" == "" ]]
 then
