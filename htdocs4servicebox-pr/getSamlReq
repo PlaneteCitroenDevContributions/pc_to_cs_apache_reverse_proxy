@@ -548,17 +548,17 @@ then
     exit 0
 else
 
-    echo -n 'SAMLRequest: '"${SAMLREQUEST}"
+    echo 'SAMLRequest: '"${SAMLREQUEST}"
     echo 'SAMLLogoutRequest: '"${SAMLLOGOUTREQUEST}"
     echo 'gigyaUrl: '"${GIGYAURL}"
     echo "debug_login_token: ${LOGIN_TOKEN}"
 #!!!    echo 'Status: 302 Redirect'
 #!!!    echo 'Location: /do/newApvprStart?toto=tata'
-    echo "Set-Cookie: ${HTTP_COOKIE}"
+#!!    echo "Set-Cookie: ${HTTP_COOKIE}"
     echo 'Cache-control: no-cache, no-store, max-age=0'
     echo 'Pragma: no-cache'
-    echo 'userId: AN87705439'
-    echo "sessionId: ${SET_JSESSIONID#*=}"
+#!!!    echo 'userId: AN87705439'
+#!!!    echo "sessionId: ${SET_JSESSIONID#*=}"
 #!!!    echo 'Location: /socle/?start=true'
 #!!    echo 'Location: https://dev.servicebox.forumtestplanetecitroen.fr/'
     echo
