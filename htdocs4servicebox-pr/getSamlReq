@@ -42,9 +42,10 @@ trace ()
     done
 }
 
-trace '==============================='
+trace '=============================================================================='
 trace "$( date )"
 trace "$( env )"
+trace '=============================================================================='
 
 HERE=$( dirname "$0" )
 
@@ -191,7 +192,6 @@ else
 	    )
 fi
 
-trace "==> HTTP_REQ: ${HTTP_REQ}"
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_getSamlReq_response.txt"
 
 while IFS= read -r header
@@ -253,7 +253,6 @@ else
 		    -D - \
 		    -A "${USERAGENT}" \
 		    -X GET \
-		    --location --max-redirs 10 \
 		    "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}" \
 		    | \
 		    sed -e 's/\r$//'
@@ -268,7 +267,7 @@ do
         if [[ $header == *"samlContext="* ]]; then
                 SAMLCONTEXT=$(echo -n $header | sed 's/.*samlContext=\([^&]*\).*/\1/i')
         fi
-done <<< "$HTTP_REQ"
+done <<< "${HTTP_REQ}"
 
 trace "His SAMLCONTEXT: ${SAMLCONTEXT}"
 
