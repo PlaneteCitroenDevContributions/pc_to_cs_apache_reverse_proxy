@@ -550,6 +550,10 @@ echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_servicebox_url_response.txt"
 
 trace "HERE: ${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} "
 
+#
+# generate response
+# =================
+#
 
 if [[ "${LOGIN_TOKEN}" == "" ]]
 then
