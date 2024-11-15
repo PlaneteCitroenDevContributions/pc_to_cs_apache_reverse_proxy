@@ -520,10 +520,6 @@ trace "My LOGIN_TOKEN: $LOGIN_TOKEN"
 # =====================================================
 #
 
-trace "Call: https://login-ra.fiat.com/saml/v2.0/${APIKEY}/idp/sso/continue?samlContext=${SAMLCONTEXT}&loginToken=${LOGIN_TOKEN}"
-
-USERAGENT='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0'
-
 HTTP_REQ=$( curl \
 		-s \
 		-D - \
@@ -557,15 +553,27 @@ SAMLRESPONSE_ENCODED=$(urlencode "${SAMLRESPONSE}")
 trace "My SAMLRESPONSE: ${SAMLRESPONSE}"
 trace "My SERVICEBOX_URL: ${SERVICEBOX_URL}"
 
+#
+# final call to SERVICEBOX_URL
+# ============================
+#
 
-trace "BREAK"
-exit 1
 
-HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X POST "${SERVICEBOX_URL}" -d "SAMLResponse=${SAMLRESPONSE_ENCODED}" -H "Cookie: ${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} ")
+HTTP_REQ=$( curl \
+		-s \
+		-D - \
+		-A "${USERAGENT}" \
+		-X POST \
+		-d "SAMLResponse=${SAMLRESPONSE_ENCODED}" \
+		--cookie "${SET_BIGIPSERVER}" \
+		--cookie "${SET_PSA_COUNTRY}" \
+ 		--cookie "${SET_JSESSIONID}" \
+		"${SERVICEBOX_URL}" \
+	    	| \
+		sed -e 's/\r$//'
+	    )
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_servicebox_url_response.txt"
-
-trace "HERE: ${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} "
 
 #
 # generate response
