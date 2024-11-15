@@ -90,26 +90,6 @@ getHeaderValueFor ()
 }
 
 
-html_log_message () {
-    echo "$@" | while read -r line
-    do
-       echo "<p>=== ${line} </p>"
-    done
-}
-
-query_string_array_init_val=$(
-
-    IFS='&'
-    set -- ${QUERY_STRING}
-    for i in "$@"
-    do
-       IFS='='
-       set -- $i
-       echo "[$1]=$2"
-    done
-
-)
-
 #
 # global definitions
 #
@@ -122,8 +102,6 @@ then
 else
     USERAGENT="${HTTP_USER_AGENT}"
 fi
-
-eval declare -A query_string_array=( ${query_string_array_init_val} )
 
 #
 # Starts to get all params whith the aim to login in
@@ -563,7 +541,7 @@ else
 #!!    echo 'Location: https://dev.servicebox.forumtestplanetecitroen.fr/'
     echo
 
-    trace "Return code 301 with LoginToken: ${LOGIN_TOKEN}"
+    trace "Return code 302 with LoginToken: ${LOGIN_TOKEN}"
     exit 0
 fi
 
@@ -572,7 +550,7 @@ fi
 #
 # ============================================
 #
-# OLD CODE
+# OLD CODE -- **** REST OF FILE NOT USED **** 
 #
 # NOT REACHED
 #
@@ -580,8 +558,21 @@ fi
 exit 1
 
 
+query_string_array_init_val=$(
+
+    IFS='&'
+    set -- ${QUERY_STRING}
+    for i in "$@"
+    do
+       IFS='='
+       set -- $i
+       echo "[$1]=$2"
+    done
+
+)
 
 
+eval declare -A query_string_array=( ${query_string_array_init_val} )
 
 
 echo 'RespHead: ABC'
