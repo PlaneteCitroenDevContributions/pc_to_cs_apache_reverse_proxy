@@ -522,8 +522,11 @@ trace "My LOGIN_TOKEN: $LOGIN_TOKEN"
 
 trace "Call: https://login-ra.fiat.com/saml/v2.0/${APIKEY}/idp/sso/continue?samlContext=${SAMLCONTEXT}&loginToken=${LOGIN_TOKEN}"
 
+USERAGENT='Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0'
+
 HTTP_REQ=$( curl \
 		-s \
+		-D - \
 		-A "${USERAGENT}" \
 		--cookie "gmid=${GMID}" \
 		--cookie "ucid=${UCID}" \
@@ -543,6 +546,20 @@ do
                 SERVICEBOX_URL=$(echo $data | sed 's/.* method="post" action="\([^"]*\).*$/\1/i')
         fi
 done <<< "$HTTP_REQ"
+
+trace "His SAMLRESPONSE: ${SAMLRESPONSE}"
+trace "His SERVICEBOX_URL: ${SERVICEBOX_URL}"
+
+SAMLRESPONSE=$(echo "${HTTP_REQ}" | sed -n -e '/name="SAMLResponse"/s/.*name="SAMLResponse"[ \t]*value="\([^"]*\)".*/\1/p' )
+SERVICEBOX_URL=$(echo "${HTTP_REQ}" | sed -n -e '/name="SAMLResponse"/s/.*id="selfForm"[ \t]*method="post"[ \t]*action="\([^"]*\)".*/\1/p' )
+SAMLRESPONSE_ENCODED=$(urlencode "${SAMLRESPONSE}")
+
+trace "My SAMLRESPONSE: ${SAMLRESPONSE}"
+trace "My SERVICEBOX_URL: ${SERVICEBOX_URL}"
+
+
+trace "BREAK"
+exit 1
 
 HTTP_REQ=$(curl -s -D - -A "${USERAGENT}" -X POST "${SERVICEBOX_URL}" -d "SAMLResponse=${SAMLRESPONSE_ENCODED}" -H "Cookie: ${JSESSIONID} ${PSACOUNTRY} ${BIGIPSERVER} ")
 
