@@ -187,6 +187,7 @@ done <<< "${HTTP_REQ}"
 trace "His GIGYAURL: ${GIGYAURL}"
 trace "His APIKEY: ${APIKEY}"
 trace "His SAMLREQUEST: ${SAMLREQUEST}"
+trace "His SAMLREQUEST_ENCODED: ${SAMLREQUEST_ENCODED}"
 
 GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/[^:]*:[ \t]*\(.*\)$/\1/p' )
 
@@ -203,6 +204,7 @@ SAMLLOGOUTREQUEST=$( echo "${HTTP_REQ}" | getHeaderValueFor 'SAMLLogoutRequest' 
 trace "My GIGYAURL: ${GIGYAURL}"
 trace "My APIKEY: ${APIKEY}"
 trace "My SAMLREQUEST: ${SAMLREQUEST}"
+trace "My SAMLREQUEST_ENCODED: ${SAMLREQUEST_ENCODED}"
 
 #
 # call GIGYAURL
@@ -231,6 +233,7 @@ else
 		    -D - \
 		    -A "${USERAGENT}" \
 		    -X GET \
+		    --location \
 		    "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}" \
 		    | \
 		    sed -e 's/\r$//'
@@ -238,7 +241,7 @@ else
 	    )
 fi
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL_response.txt"
+echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL_followed_response.txt"
 
 while IFS= read -r header
 do
@@ -253,6 +256,7 @@ _locationHeader=$( echo "${HTTP_REQ}" | getHeaderValueFor 'location' )
 SAMLCONTEXT=$( echo "${_locationHeader}" | sed -n -e 's/.*&samlContext=\([^&]*\).*/\1/p' )
 
 trace "My SAMLCONTEXT: ${SAMLCONTEXT}"
+
 
 #
 # call https://login-ra.fiat.com/accounts.webSdkBootstrap
