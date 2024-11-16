@@ -189,33 +189,16 @@ trace "My SAMLREQUEST_ENCODED: ${SAMLREQUEST_ENCODED}"
 #
 
 
-if ${_useTestFrames}
-then
-    HTTP_REQ='HTTP/2 302 
-content-length: 0
-date: Sun, 10 Nov 2024 15:28:21 GMT
-cache-control: private
-location: https://www.technicalinformation.fiat.com/proxyPage.html?mode=login&samlContext=eu1_352063790294_08cd7025-da4a-497e-bc45-87acfb606d85&spName=POISP
-p3p: CP="IDC COR PSA DEV ADM OUR IND ONL"
-x-error-code: 0
-x-soa: true, Gator
-x-server: eu1a-nomad-t3
-x-callid: 0f03ecb7b0754446b76525c612e21298
-x-robots-tag: none
-
-'
-else
-    HTTP_REQ=$(	curl \
-		    -s \
-		    -D - \
-		    -A "${USERAGENT}" \
-		    -X GET \
-		    --location \
-		    "${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}" \
-		    | \
-		    sed -e 's/\r$//'
-
-	    )
+HTTP_REQ=$( curl \
+		-s \
+		-D - \
+		-A "${USERAGENT}" \
+		-X GET \
+		--location \
+		"${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST_ENCODED}" \
+		| \
+		sed -e 's/\r$//'
+	)
 fi
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL_followed_response.txt"
@@ -240,48 +223,14 @@ trace "My SAMLCONTEXT: ${SAMLCONTEXT}"
 # =======================================================
 #
 
-if ${_useTestFrames}
-then
-    HTTP_REQ='HTTP/2 200 
-content-type: text/javascript; charset=utf-8
-content-length: 199
-date: Sun, 10 Nov 2024 15:50:38 GMT
-cache-control: private
-set-cookie: gmid=gmid.ver4.AtLtgOTaHQ.pJoMsCtK7BCeu9DnWD3YMG54Ifu1HGnhQbYLqaGEI-xHyTQawKl-qh2eQMc0Bg0F.fLROyC1GmEzb0p6Vz29jcalswwRCiJP61LjD8M89ZdlexmVSZU8E9pA9qRE3FExIYU5hG8MIaanHQHr5Vr9ikQ.sc3; expires=Mon, 10 Nov 2025 15:50:39 GMT; domain=.login-ra.fiat.com; path=/; secure; samesite=none; httponly
-set-cookie: ucid=FgooeUBaDUjpPGWIPTo1-g; expires=Mon, 10 Nov 2025 15:50:39 GMT; domain=.login-ra.fiat.com; path=/; secure; samesite=none; httponly
-set-cookie: hasGmid=ver4; expires=Sat, 10 May 2025 15:50:39 GMT; domain=.login-ra.fiat.com; path=/; secure; samesite=none
-p3p: CP="IDC COR PSA DEV ADM OUR IND ONL"
-x-error-code: 0
-x-soa: true, Gator
-x-server: eu1b-nomad-t7
-x-callid: 8f7d6e656cda48199d5a1701cf61132d
-x-robots-tag: none
-x-cache: Miss from cloudfront
-via: 1.1 5cf26f8164e0cad37f6634ff6aeac4ce.cloudfront.net (CloudFront)
-x-amz-cf-pop: FRA60-P5
-x-amz-cf-id: 78A3H2gltQxEGemmu0dbfe0vS0b1Hmje9eP7JC7tfIQdb3n7nBYPkQ==
-
-{
-  "callId": "8f7d6e656cda48199d5a1701cf61132d",
-  "errorCode": 0,
-  "apiVersion": 2,
-  "statusCode": 200,
-  "statusReason": "OK",
-  "time": "2024-11-10T15:50:39.292Z",
-  "hasGmid": "ver4"
-}
-'
-else
-
-    HTTP_REQ=$( curl \
-		    -s \
-		    -D - \
-		    -A "${USERAGENT}" \
-		    -X GET 'https://login-ra.fiat.com/accounts.webSdkBootstrap?apiKey='"${APIKEY}"'&pageURL='"${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST}"'&sdk=js_latest&sdkBuild=16506&format=json' \
-		    | \
-		    sed -e 's/\r$//'
-	    )
-fi
+HTTP_REQ=$( curl \
+		-s \
+		-D - \
+		-A "${USERAGENT}" \
+		-X GET 'https://login-ra.fiat.com/accounts.webSdkBootstrap?apiKey='"${APIKEY}"'&pageURL='"${GIGYAURL}"'?SAMLRequest='"${SAMLREQUEST}"'&sdk=js_latest&sdkBuild=16506&format=json' \
+		| \
+		sed -e 's/\r$//'
+	)
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_webSdkBootstrap_response.txt"
 
