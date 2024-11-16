@@ -168,6 +168,7 @@ trace "My SAMLREQUEST_ENCODED: ${SAMLREQUEST_ENCODED}"
 # =============
 #
 
+# FIXME: is --location needed???
 
 HTTP_REQ=$( curl \
 		-s \
@@ -181,15 +182,6 @@ HTTP_REQ=$( curl \
 	)
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL_followed_response.txt"
-
-while IFS= read -r header
-do
-        if [[ $header == *"samlContext="* ]]; then
-                SAMLCONTEXT=$(echo -n $header | sed 's/.*samlContext=\([^&]*\).*/\1/i')
-        fi
-done <<< "${HTTP_REQ}"
-
-trace "His SAMLCONTEXT: ${SAMLCONTEXT}"
 
 _locationHeader=$( echo "${HTTP_REQ}" | getHeaderValueFor 'location' )
 SAMLCONTEXT=$( echo "${_locationHeader}" | sed -n -e 's/.*&samlContext=\([^&]*\).*/\1/p' )
