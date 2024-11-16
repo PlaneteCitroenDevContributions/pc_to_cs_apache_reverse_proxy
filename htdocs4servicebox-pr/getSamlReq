@@ -278,18 +278,6 @@ HTTP_REQ=$( curl \
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_continue_response.txt"
 
-while IFS= read -r data
-do
-        if [[ $data == *"SAMLResponse"* ]]; then
-                SAMLRESPONSE=$(echo $data | sed 's/.* name="SAMLResponse" value="\([^"]*\).*$/\1/i')
-                SAMLRESPONSE_ENCODED=$(urlencode $SAMLRESPONSE)
-                SERVICEBOX_URL=$(echo $data | sed 's/.* method="post" action="\([^"]*\).*$/\1/i')
-        fi
-done <<< "$HTTP_REQ"
-
-trace "His SAMLRESPONSE: ${SAMLRESPONSE}"
-trace "His SERVICEBOX_URL: ${SERVICEBOX_URL}"
-
 SAMLRESPONSE=$(echo "${HTTP_REQ}" | sed -n -e '/name="SAMLResponse"/s/.*name="SAMLResponse"[ \t]*value="\([^"]*\)".*/\1/p' )
 SERVICEBOX_URL=$(echo "${HTTP_REQ}" | sed -n -e '/name="SAMLResponse"/s/.*id="selfForm"[ \t]*method="post"[ \t]*action="\([^"]*\)".*/\1/p' )
 SAMLRESPONSE_ENCODED=$(urlencode "${SAMLRESPONSE}")
