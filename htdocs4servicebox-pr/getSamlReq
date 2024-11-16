@@ -149,23 +149,6 @@ HTTP_REQ=$( curl \
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_getSamlReq_response.txt"
 
-while IFS= read -r header
-do
-        if [[ $header == *"gigyaUrl"* ]]; then
-                GIGYAURL=$(echo -n $header | sed 's/^gigyaUrl: \(.*\)\r/\1/i')
-                APIKEY=$(echo $header | sed 's/.*v2.0\/\([a-zA-Z0-9\-_]*\)\/.*$/\1/i')
-        fi
-        if [[ $header == *"SAMLRequest"* ]]; then
-                SAMLREQUEST=$(echo -n $header | sed 's/^SAMLRequest: \(.*\)\r/\1/i')
-                SAMLREQUEST_ENCODED=$(urlencode $SAMLREQUEST)
-        fi
-done <<< "${HTTP_REQ}"
-
-trace "His GIGYAURL: ${GIGYAURL}"
-trace "His APIKEY: ${APIKEY}"
-trace "His SAMLREQUEST: ${SAMLREQUEST}"
-trace "His SAMLREQUEST_ENCODED: ${SAMLREQUEST_ENCODED}"
-
 GIGYAURL=$( echo "${HTTP_REQ}" | sed -n -e '/^gigya[uU]rl:/s/[^:]*:[ \t]*\(.*\)$/\1/p' )
 
 GIGYAURL=$( echo "${HTTP_REQ}" | getHeaderValueFor 'gigyaUrl' )
