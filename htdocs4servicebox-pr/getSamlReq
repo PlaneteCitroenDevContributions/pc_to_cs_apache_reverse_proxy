@@ -96,8 +96,26 @@ else
 fi
 
 #
-# Starts to get all params whith the aim to login in
+# Start to get all params whith the aim to login in
+# =================================================
 #
+
+# Retrieve credentials for file share with the Cloud
+
+
+: ${CREDENTIAL_FILE:="${HERE}/cs_credential.txt"}
+
+credential_file_effective_content=$(
+    sed -e '/^[ \t]*#/d' "${CREDENTIAL_FILE}"
+)
+
+cs_login=$(
+    grep 'cs_login' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+)
+
+cs_password=$(
+    grep 'cs_password' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
+	   )
 
 #
 # get SAML Auth
@@ -227,8 +245,8 @@ HTTP_REQ=$( curl \
 		-D - \
 		-A "${USERAGENT}" \
 		-X POST \
-		-d "loginID=${LOGIN}" \
-		-d "password=${PASSWORD}" \
+		-d "loginID=${cs_login}" \
+		-d "password=${cs_password}" \
 		-d "sessionExpiration=2628000" \
 		-d "targetEnv=jssdk" \
 		-d "include=profile%2Cdata%2Cemails%2Csubscriptions%2Cpreferences%2C" \
