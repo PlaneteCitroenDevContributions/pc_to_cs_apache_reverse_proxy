@@ -199,7 +199,6 @@ HTTP_REQ=$( curl \
 		| \
 		sed -e 's/\r$//'
 	)
-fi
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL_followed_response.txt"
 
