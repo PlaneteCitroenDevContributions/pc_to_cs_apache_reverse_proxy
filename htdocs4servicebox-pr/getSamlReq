@@ -205,23 +205,6 @@ HTTP_REQ=$( curl \
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_webSdkBootstrap_response.txt"
 
-while IFS= read -r header
-do
-        if [[ $header == *"gmid="* ]]; then
-                GMID=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1/i')
-        fi
-        if [[ $header == *"ucid="* ]]; then
-                UCID=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1/i')
-        fi
-        if [[ $header == *"hasGmid="* ]]; then
-                HASGMID=$(echo $header | sed 's/^Set-Cookie: \([^;]*;\).*$/\1/i')
-        fi
-done <<< "$HTTP_REQ"
-
-trace "His GMID: $GMID"
-trace "His UCID: $UCID"
-trace "His HASGMID: $HASGMID"
-
 GMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*gmid=/s/[^=]*=\([^;]*\);.*$/\1/p')
 UCID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*ucid=/s/[^=]*=\([^;]*\);.*$/\1/p')
 HASGMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*has[gG]mid=/s/[^=]*=\([^;]*\);.*$/\1/p')
