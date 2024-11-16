@@ -268,159 +268,34 @@ RISKCONTEXT=$( urlencode '{"b0":53295,"b1":[104,68,180,220],"b2":6,"b3":[],"b4":
 
 trace "RISKCONTEXT: ${RISKCONTEXT}"
 
-if ${_useTestFrames}
-then
-    HTTP_REQ='HTTP/2 200 
-content-type: text/javascript; charset=utf-8
-content-length: 3311
-date: Sun, 10 Nov 2024 16:20:15 GMT
-cache-control: private
-set-cookie: glt_4_orFmUKH1TrnP0kMf3hryrA=st2.s.AtLt3TJKBg.IFmU4cxX3549vuF15wsrIfX3o24-XOfsr_b3Afc-d-VsnLsvCOWyC43mWM_-sig_1vEO0MaB-S8ePdXKrPybcQ0RwZyXXixt6zeklq-3dFUC0VcZxD3txM55JMm3ianX.ppxg7gyph7dnUVHrB948jCe3G-9_-24admXA3N3oCUjoi67oat1wcSM3vgMB32dI1o4_AtKrCk1odpTljTkY9Q.sc3; expires=Wed, 11 Dec 2024 02:20:15 GMT; domain=fiat.com; path=/; secure
-p3p: CP="IDC COR PSA DEV ADM OUR IND ONL"
-x-error-code: 0
-x-soa: true, Gator
-x-server: eu1a-nomad-t6
-x-callid: 5ba65b108d5842449089607146664843
-x-robots-tag: none
-x-cache: Miss from cloudfront
-via: 1.1 e505058447bf5e74cc264f4e72f27bee.cloudfront.net (CloudFront)
-x-amz-cf-pop: FRA60-P5
-x-amz-cf-id: oTR5vezUOqJ9A8aBXCshVT-5oD_wPLMBcuggCoXwT2oPKX8u68702w==
-
-{
-  "callId": "5ba65b108d5842449089607146664843",
-  "errorCode": 0,
-  "apiVersion": 2,
-  "statusCode": 200,
-  "statusReason": "OK",
-  "time": "2024-11-10T16:20:15.827Z",
-  "registeredTimestamp": 1729536189,
-  "UID": "43fceea16b824a85a7962cb0edd5efdd",
-  "UIDSignature": "Zz1lOmnhuY7vfNkOnRn0Xsh6JjI=",
-  "signatureTimestamp": "1731255615",
-  "created": "2024-10-21T18:43:09.430Z",
-  "createdTimestamp": 1729536189,
-  "data": {
-    "locationTown": "Caen",
-    "locationName": "Association Planète-Chevrons",
-    "locationCountry": "FR",
-    "locationZIP": "14000",
-    "VAT": "FR88482549870",
-    "companyCountry": "FR",
-    "locationAddress": "129 rue branville",
-    "sourceApplication": "TI",
-    "poiUserIds": [
-      "AN87705439"
-    ]
-  },
-  "subscriptions": {},
-  "preferences": {},
-  "emails": {
-    "verified": [
-      "nv14000@live.fr"
-    ],
-    "unverified": []
-  },
-  "isActive": true,
-  "isRegistered": true,
-  "isVerified": true,
-  "lastLogin": "2024-11-10T16:20:15.773Z",
-  "lastLoginTimestamp": 1731255615,
-  "lastUpdated": "2024-10-21T18:43:11.480Z",
-  "lastUpdatedTimestamp": 1729536191480,
-  "loginProvider": "site",
-  "oldestDataUpdated": "2024-10-21T18:43:09.430Z",
-  "oldestDataUpdatedTimestamp": 1729536189430,
-  "profile": {
-    "firstName": "Nicolas",
-    "lastName": "Voisin",
-    "email": "nv14000@live.fr"
-  },
-  "registered": "2024-10-21T18:43:09.430Z",
-  "socialProviders": "site",
-  "verified": "2024-10-21T18:43:09.430Z",
-  "verifiedTimestamp": 1729536189430,
-  "userInfo": {
-    "UID": "43fceea16b824a85a7962cb0edd5efdd",
-    "UIDSig": "ffKSCMdGvQstTesfF4WkVp9kH8k=",
-    "UIDSignature": "Zz1lOmnhuY7vfNkOnRn0Xsh6JjI=",
-    "signatureTimestamp": "1731255615",
-    "isSiteUser": true,
-    "isConnected": true,
-    "isTempUser": false,
-    "isLoggedIn": true,
-    "loginProvider": "site",
-    "loginProviderUID": "43fceea16b824a85a7962cb0edd5efdd",
-    "isSiteUID": true,
-    "identities": [
-      {
-        "provider": "site",
-        "providerUID": "43fceea16b824a85a7962cb0edd5efdd",
-        "allowsLogin": true,
-        "isLoginIdentity": true,
-        "isExpiredSession": false,
-        "lastUpdated": "2024-11-10T16:20:15.7730629Z",
-        "lastUpdatedTimestamp": 1731255615773,
-        "oldestDataUpdated": "2024-10-21T18:43:09.43Z",
-        "oldestDataUpdatedTimestamp": 1729536189430,
-        "firstName": "Nicolas",
-        "lastName": "Voisin",
-        "nickname": "Nicolas Voisin",
-        "email": "nv14000@live.fr"
-      }
-    ],
-    "nickname": "Nicolas Voisin",
-    "firstName": "Nicolas",
-    "lastName": "Voisin",
-    "email": "nv14000@live.fr",
-    "capabilities": "None",
-    "providers": "site",
-    "oldestDataUpdatedTimestamp": 1729536189,
-    "oldestDataAge": 1719427,
-    "statusReason": "OK",
-    "statusCode": 200,
-    "timestamp": "2024-11-10 16:20:15",
-    "time": "2024-11-10T16:20:15.817Z",
-    "errorCode": 0
-  },
-  "newUser": false,
-  "sessionInfo": {
-    "login_token": "st2.s.AtLt3TJKBg.IFmU4cxX3549vuF15wsrIfX3o24-XOfsr_b3Afc-d-VsnLsvCOWyC43mWM_-sig_1vEO0MaB-S8ePdXKrPybcQ0RwZyXXixt6zeklq-3dFUC0VcZxD3txM55JMm3ianX.ppxg7gyph7dnUVHrB948jCe3G-9_-24admXA3N3oCUjoi67oat1wcSM3vgMB32dI1o4_AtKrCk1odpTljTkY9Q.sc3",
-    "expires_in": "2628000"
-  }
-}
-'
-else
-
-    HTTP_REQ=$( curl \
-		    -s \
-		    -D - \
-		    -A "${USERAGENT}" \
-		    -X POST \
-		    -d "loginID=${LOGIN}" \
-		    -d "password=${PASSWORD}" \
-		    -d "sessionExpiration=2628000" \
-		    -d "targetEnv=jssdk" \
-		    -d "include=profile%2Cdata%2Cemails%2Csubscriptions%2Cpreferences%2C" \
-		    -d "includeUserInfo=true" \
-		    -d "loginMode=standard" \
-		    -d "lang=fr" \
-		    -d "riskContext=${RISKCONTEXT}" \
-		    -d "APIKey=${APIKEY}" \
-		    -d "source=showScreenSet" \
-		    -d "sdk=js_latest" \
-		    -d "authMode=cookie" \
-		    -d "pageURL=https%3A%2F%2Flogin-ra.fiat.com%2F" \
-		    -d "sdkBuild=16506" \
-		    -d "format=json" \
-		    --cookie "gmid=${GMID}" \
-		    --cookie "ucid=${UCID}" \
-		    --cookie "hasGmid=${HASGMID}" \
-		    'https://login-ra.fiat.com/accounts.login' \
-		    | \
-		    sed -e 's/\r$//'
-	    )
-fi
+HTTP_REQ=$( curl \
+		-s \
+		-D - \
+		-A "${USERAGENT}" \
+		-X POST \
+		-d "loginID=${LOGIN}" \
+		-d "password=${PASSWORD}" \
+		-d "sessionExpiration=2628000" \
+		-d "targetEnv=jssdk" \
+		-d "include=profile%2Cdata%2Cemails%2Csubscriptions%2Cpreferences%2C" \
+		-d "includeUserInfo=true" \
+		-d "loginMode=standard" \
+		-d "lang=fr" \
+		-d "riskContext=${RISKCONTEXT}" \
+		-d "APIKey=${APIKEY}" \
+		-d "source=showScreenSet" \
+		-d "sdk=js_latest" \
+		-d "authMode=cookie" \
+		-d "pageURL=https%3A%2F%2Flogin-ra.fiat.com%2F" \
+		-d "sdkBuild=16506" \
+		-d "format=json" \
+		--cookie "gmid=${GMID}" \
+		--cookie "ucid=${UCID}" \
+		--cookie "hasGmid=${HASGMID}" \
+		'https://login-ra.fiat.com/accounts.login' \
+		| \
+		sed -e 's/\r$//'
+	)
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_accounts_login_response.txt"
 
