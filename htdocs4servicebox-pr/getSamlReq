@@ -253,17 +253,6 @@ HTTP_REQ=$( curl \
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_accounts_login_response.txt"
 
-while IFS= read -r header
-do
-        if [[ $header == *"glt_"* ]]; then
-                GLT=$(echo $header | sed 's/^[sS]et-[cC]ookie: \([^;]*;\).*$/\1/i')
-                LOGIN_TOKEN=$(echo $header | sed 's/^[sS]et-[cC]ookie: [^=]*=\([^;]*\);.*$/\1/i')
-        fi
-done <<< "$HTTP_REQ"
-
-trace "His GLT: $GLT"
-trace "His LOGIN_TOKEN: $LOGIN_TOKEN"
-
 GLT=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*glt_/s/.*\(glt_[^;]*\);.*/\1/p')
 LOGIN_TOKEN=$(echo "${GLT}" | sed -n -e 's/[^=]*=//p')
 
