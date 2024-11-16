@@ -2,8 +2,6 @@
 
 # -*- mode: shell-script -*-
 
-#!!!! set -e
-
 if [[ -r "${0}.env.secret" ]]
 then
     source "${0}.env.secret"
@@ -27,12 +25,6 @@ then
     exec 2>"${TRACE_DIR}/stderr.log"
 fi
 
-if [[ -n "${USE_TEST_FRAMES}" ]]
-then
-    _useTestFrames=true
-else
-    _useTestFrames=false
-fi
 
 trace ()
 {
@@ -141,34 +133,19 @@ trace "Has SET_PSA_COUNTRY: ${SET_PSA_COUNTRY}"
 trace "Has SET_BIGIPSERVER: ${SET_BIGIPSERVER}"
 
 
-if ${_useTestFrames}
-then
-    HTTP_REQ='HTTP/1.1 200 
-Cache-control: no-cache, no-store, max-age=0
-Pragma: no-cache
-SAMLRequest: jZJPT+MwFMTvfArr3R3nH7S1mqLuogoEiIike9jLynGc1trEDn5OBd+ebEq1HBBwfjOa8fy8vHzuWnJQDrU1GURBCEQZaWttdhlsyw2dw+XqbImia/uYrwe/N4/qaVDoyeg0yI+XDAZnuBWokRvRKeRe8mJ9f8fjIOS9s95K2wJZIyrnx6yf1uDQKVcod9BSbR/vMth73yNnrB+qVssAj6fKPtNeOI+BtB3b6d2LKIoHIFdjB22En4qfrI2uu0ANUTDpJse/guww1mDpH+s23fb2OiqdycO/902ydy9uzXTdM0QLZGOdVNMjM2hEiwrIzVUGYRLOZKUSWs+SmKaL5pxW9UVI42ZRJ3IuosW8GpWYC0R9UP+9iIO6MeiF8RnEYZzSKKJRWEbnPF3wNA2SePYbSP62zw9tjsN/NmZ1FCG/Lsuc5g9FCeTXCeAogDdcMZ/i3TtOX2ASJziw+g6KcbEle580BrMPPsrqFQ==
-SAMLLogoutRequest: hZFBb8IwDIXv%2BxVV7mmaUto1oiAkhIYG0rTBDrtMaRpKtDbp4rSCf78AQ%2BIwaVfbz8%2Fv82R2bJtgkBaU0QWiYYQCqYWplK4LtNsu8SOaTR8mwNumi9na1KZ3r%2FK7l%2BACL9XArq0C9VYzw0EB07yVwJxgb%2FPNmsVhxDprnBGmQcHCC5Xm7mJ3cK4DRsheVW0oexrWqj7xUJiWnLeSwWtJ8mnsst09P9Gt1S%2FR12Y%2FOtiTnRNVdQQag4LVokBZmmdjLiTmeSpxIiqJyyopcU5TybOSUyFSPwkvHEANskB73oA8V6CXKw2Oa1egOIoTTCmm0ZaOWZKzJAlHcfaBgvcbIn8S%2BgUSs4va3oH4h4M3l%2FacHU1v2bu%2BbJQIfX1QQpbmiDtuHVwhgJmQeydvTP56xfQH
-gigyaUrl: https://fidm.eu1.gigya.com/saml/v2.0/4_orFmUKH1TrnP0kMf3hryrA/idp/sso
-Content-Length: 0
-Date: Sun, 10 Nov 2024 14:49:43 GMT
-
-'
-else
-
-    HTTP_REQ=$( curl \
-		    -s \
-		    -D - \
-		    -A "${USERAGENT}" \
-		    -X POST \
-		    --cookie "${SET_BIGIPSERVER}" \
-		    --cookie "${SET_PSA_COUNTRY}" \
- 		    --cookie "${SET_JSESSIONID}" \
- 		    -d '' \
- 		    "${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq" \
-		    | \
-		    sed -e 's/\r$//'
-	    )
-fi
+HTTP_REQ=$( curl \
+		-s \
+		-D - \
+		-A "${USERAGENT}" \
+		-X POST \
+		--cookie "${SET_BIGIPSERVER}" \
+		--cookie "${SET_PSA_COUNTRY}" \
+ 		--cookie "${SET_JSESSIONID}" \
+ 		-d '' \
+ 		"${PUBLIC_SERVICE_BOX_ROOT_URL}/getSamlReq" \
+		| \
+		sed -e 's/\r$//'
+	)
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_getSamlReq_response.txt"
 
