@@ -10,9 +10,6 @@ services:
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential-plus.txt
 
-     volumes:
-        - ./cs2pc-rproxy-httpd-auth-plus.conf:/usr/local/apache2/conf/cs2pc-rproxy-httpd-auth.conf:ro
-
      command:
         - httpd-foreground
         - -DCS2PC_PLUS
