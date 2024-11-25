@@ -14,6 +14,10 @@ services:
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
 
+     command:
+        - httpd-foreground
+        - -DCS2PC_BASIC
+
      networks:
         - auto_https_reverse_proxy
         - internal_services
