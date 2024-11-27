@@ -1,6 +1,4 @@
-# -*- mode: indented-text; tab-width: 3; indent-tabs-mode: nil -*-
-
-version: '3'
+# -*- mode: yaml; tab-width: 3; indent-tabs-mode: nil -*-
 
 services:
 

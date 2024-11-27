@@ -1,7 +1,0 @@
-#
-# empty directory
-#
-
-*
-!.gitignore
-!.README.md
