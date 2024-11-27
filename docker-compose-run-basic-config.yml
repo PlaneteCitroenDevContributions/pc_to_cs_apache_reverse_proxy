@@ -10,7 +10,7 @@ services:
         - 8888:80
 
      environment:
-        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential.txt
+        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential-plus.txt
 
      command:
         - httpd-foreground
