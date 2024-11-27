@@ -1,18 +1,14 @@
 # -*- mode: yaml; tab-width: 3; indent-tabs-mode: nil -*-
 
+#
+# used to add some params to docker-compose-run-plus-config.yml or docker-compose-run-basic-config.yml
+#
+
 services:
 
   reverse-proxy-to-cs:
-     hostname: reverse-proxy-to-cs-dev
      ports:
         - 7778:80
-
-     environment:
-        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential-plus.txt
-
-     command:
-        - httpd-foreground
-        - -DCS2PC_PLUS
 
      labels: # add directly Traefik config to prevent additionnal socat
         - "traefik.enable=true"
@@ -20,17 +16,3 @@ services:
         - "traefik.http.routers.servicebox-dev.tls=true"
         - "traefik.http.routers.servicebox-dev.tls.certresolver=letsencrypt-resolver"
         - "traefik.http.routers.servicebox-dev.entrypoints=websecure"
-
-     networks:
-        - auto_https_reverse_proxy
-        - internal_services
-
-networks:
-
-   auto_https_reverse_proxy:
-      name: revproxy
-      external: true
-
-   internal_services:
-      name: internal_services
-      external: true
