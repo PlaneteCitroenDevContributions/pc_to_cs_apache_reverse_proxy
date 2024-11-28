@@ -7,6 +7,7 @@
 services:
 
   reverse-proxy-to-cs:
+     hostname: reverse-proxy-to-cs-dev
      ports:
         - 7778:80
 
@@ -16,3 +17,24 @@ services:
         - "traefik.http.routers.servicebox-dev.tls=true"
         - "traefik.http.routers.servicebox-dev.tls.certresolver=letsencrypt-resolver"
         - "traefik.http.routers.servicebox-dev.entrypoints=websecure"
+
+     environment:
+        - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential-plus.txt
+
+     command:
+        - httpd-foreground
+        - -DCS2PC_PLUS
+
+     networks:
+        - auto_https_reverse_proxy
+        - internal_services
+
+networks:
+   auto_https_reverse_proxy:
+      external: true
+      name: revproxy
+
+   internal_services:
+      external: true
+      name: internal_services
+        
