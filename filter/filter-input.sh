@@ -266,58 +266,63 @@ case "${REQUEST_URI}" in
 	# should be check at the begining to orient execution
 	#
 
+	# TODO: check that this code is no more necessary after migration to SAML login
 	#
-	# get provided credentials from the body
-	#
-	userid=$(
-	    sed -e 's/.*&userid=\([^&]*\)&.*/\1/' "${in_file}"
-	      )
-	password=$(
-	    sed -e 's/.*&password=\([^&]*\)&.*/\1/' "${in_file}"
-		)
+	# => user check process is no more used
 
-	if [[ -z "${userid}" ]]
+
+	# #
+	# # get provided credentials from the body
+	# #
+	# userid=$(
+	#     sed -e 's/.*&userid=\([^&]*\)&.*/\1/' "${in_file}"
+	#       )
+	# password=$(
+	#     sed -e 's/.*&password=\([^&]*\)&.*/\1/' "${in_file}"
+	# 	)
+
+	# if [[ -z "${userid}" ]]
+	# then
+	#     #
+	#     # login request does not contain any userid
+	#     # this request seems to be used to configure the login page
+	#     #
+
+	#     # we keep the content unchanged
+	#     cp "${in_file}" "${corrected_in_file}"
+	# else
+
+	#     #
+	#     # effective login/password test
+	#     # =>
+	#     #    * check if user is allowed on PC side
+	#     #    * if so, replace with the valid ServiceBox credentials
+
+	#     pc_login_success=false
+	#     loginUserid="bad_planete_citroen_association_login_${username}"
+	#     loginPassword="bad_planete_citroen_association_password_${password}"
+	#     if checkUsername "${userid}"
+	#     then
+	# 	url_decoded_user_id=$( url_decode "${userid}" )
+	# 	url_decoded_password=$( url_decode "${password}" )
+	# 	if checkUserpassword "${url_decoded_user_id}" "${url_decoded_password}"
+	# 	then
+	# 	    loginUserid="${cs_login}"
+	# 	    loginPassword="${cs_password}"
+	# 	    pc_login_success=true
+	# 	fi
+	#     fi
+
+	#     sed -e 's/&userid=[^&]*&password=[^&]*&/\&userid='${loginUserid}'\&password='${loginPassword}'\&/' "${in_file}" > "${corrected_in_file}"
+
+	if [[ -n "${AUTHENTICATE_UID}" ]]
 	then
-	    #
-	    # login request does not contain any userid
-	    # this request seems to be used to configure the login page
-	    #
-
-	    # we keep the content unchanged
-	    cp "${in_file}" "${corrected_in_file}"
+	    generateStatisticEntry 'login' "${AUTHENTICATE_UID}" 'success'
 	else
-
-	    #
-	    # effective login/password test
-	    # =>
-	    #    * check if user is allowed on PC side
-	    #    * if so, replace with the valid ServiceBox credentials
-
-	    pc_login_success=false
-	    loginUserid="bad_planete_citroen_association_login_${username}"
-	    loginPassword="bad_planete_citroen_association_password_${password}"
-	    if checkUsername "${userid}"
-	    then
-		url_decoded_user_id=$( url_decode "${userid}" )
-		url_decoded_password=$( url_decode "${password}" )
-		if checkUserpassword "${url_decoded_user_id}" "${url_decoded_password}"
-		then
-		    loginUserid="${cs_login}"
-		    loginPassword="${cs_password}"
-		    pc_login_success=true
-		fi
-	    fi
-
-	    sed -e 's/&userid=[^&]*&password=[^&]*&/\&userid='${loginUserid}'\&password='${loginPassword}'\&/' "${in_file}" > "${corrected_in_file}"
-
-	    if [[ -n "${AUTHENTICATE_UID}" ]]
-	    then
-		generateStatisticEntry 'login' "${AUTHENTICATE_UID}" 'success'
-	    else
-		generateStatisticEntry 'login' 'Internal error: missing AUTHENTICATE_UID' 'fail'
-	    fi
+	    generateStatisticEntry 'login' 'Internal error: missing AUTHENTICATE_UID' 'fail'
 	fi
 
+	cp "${in_file}" "${corrected_in_file}"
 	;;
 
     /docapvAC/affiche.do* )
@@ -326,7 +331,7 @@ case "${REQUEST_URI}" in
 	#
 	document_reference_query_field=$( echo "${QUERY_STRING}" | cut -d \& -f 1 )
 	document_reference="${document_reference_query_field#ref=}"
-        generateStatisticEntry "documentation" "${document_reference}" "none"
+        generateStatisticEntry 'documentation' "${document_reference}" "${AUTHENTICATE_UID}"
 
 	cp "${in_file}" "${corrected_in_file}"
 	;;
@@ -338,7 +343,7 @@ case "${REQUEST_URI}" in
 	jvin_field_in_body=$( sed -e '/VIN_OK_BUTTON/s/.*jvin=\([^\&]*\).*/\1/' "${in_file}" )
 	if [[ -n "${jvin_field_in_body}" ]]
 	then
-            generateStatisticEntry "vin" "${jvin_field_in_body}" "none"
+            generateStatisticEntry 'vin' "${jvin_field_in_body}" "${AUTHENTICATE_UID}"
 	fi
 
 	cp "${in_file}" "${corrected_in_file}"
