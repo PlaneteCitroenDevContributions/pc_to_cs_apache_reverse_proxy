@@ -64,6 +64,11 @@ fi
 case "${REQUEST_URI}" in
     "/elapseTime" )
 
+	# FIXME:
+	#
+	# after migration to SAML, this cas should never happen anymore
+	# it may be removed in the future
+
 	# force the response body
 	echo -n '{"showCaptcha":false}' > "${corrected_response_file}"
 	;;
