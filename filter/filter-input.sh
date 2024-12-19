@@ -232,20 +232,25 @@ fi
 
 
 case "${REQUEST_URI}" in
-    "/elapseTime" )
-	body=$( cat "${in_file}" )
-	#content = username=XXXXX
-	username=${body#username=}
 
-	if checkUsername "${username}"
-	then
-	    elapseTimeUserName="${cs_login}"
-	else
-	    elapseTimeUserName="bad_planete_citroen_assosiation_login_${username}"
-	fi
+    # TODO: check that this code is no more necessary after migration to SAML login
+    #
+    # => user check process is no more used
+    #
+    # "/elapseTime" )
+    # 	body=$( cat "${in_file}" )
+    # 	#content = username=XXXXX
+    # 	username=${body#username=}
 
-	sed -e 's/username=.*$/username='${elapseTimeUserName}'/' "${in_file}" > "${corrected_in_file}"
-	;;
+    # 	if checkUsername "${username}"
+    # 	then
+    # 	    elapseTimeUserName="${cs_login}"
+    # 	else
+    # 	    elapseTimeUserName="bad_planete_citroen_assosiation_login_${username}"
+    # 	fi
+
+    # 	sed -e 's/username=.*$/username='${elapseTimeUserName}'/' "${in_file}" > "${corrected_in_file}"
+    # 	;;
 
     /do/login* ) # same as <LocationMatch "^/do/login.*"> in http.conf
 
