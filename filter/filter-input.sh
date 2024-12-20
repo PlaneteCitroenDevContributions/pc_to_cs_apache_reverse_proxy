@@ -209,7 +209,8 @@ generateStatisticEntry ()
     (
 	# use date since epoch to easy line sorting later
         local stat_date=$( date '+%s' )
-        echo "\"${stat_date}\" \"${user}\" \"${action}\" \"${param}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
+	#FIXME: we suppose that no "'" is contained in the various fiels
+        echo "\'${stat_date}\' \'${user}\' \'${action}\' \'${param}\' \'${status}\' \'${HTTP_X_REAL_IP}\' \'${HTTP_USER_AGENT}\'"
     ) > "${stat_file}"
 }
 
