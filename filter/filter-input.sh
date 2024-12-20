@@ -186,9 +186,11 @@ mkdir -p "${STAT_DATA_DIR}"
 
 generateStatisticEntry ()
 {
-    local action="$1"
-    local param="$2"
-    local status="$3"
+    local user="$1"
+
+    local action="$2"
+    local param="$3"
+    local status="$4"
 
     local current_year=$( date '+%Y' )
     local current_month=$( date '+%m' )
@@ -207,7 +209,7 @@ generateStatisticEntry ()
     (
 	# use date since epoch to easy line sorting later
         local stat_date=$( date '+%s' )
-        echo "\"${stat_date}\" \"${action}\" \"${param}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
+        echo "\"${stat_date}\" \"${user}\" \"${action}\" \"${param}\" \"${status}\" \"${HTTP_X_REAL_IP}\" \"${HTTP_USER_AGENT}\""
     ) > "${stat_file}"
 }
 
@@ -317,9 +319,9 @@ case "${REQUEST_URI}" in
 
 	if [[ -n "${AUTHENTICATE_UID}" ]]
 	then
-	    generateStatisticEntry 'login' "${AUTHENTICATE_UID}" 'success'
+	    generateStatisticEntry "${AUTHENTICATE_UID}" 'login' "${REMOTE_USER}" 'success'
 	else
-	    generateStatisticEntry 'login' 'Internal error: missing AUTHENTICATE_UID' 'fail'
+	    generateStatisticEntry '_unknown_user_' 'login' 'Internal error: missing AUTHENTICATE_UID' 'fail'
 	fi
 
 	cp "${in_file}" "${corrected_in_file}"
@@ -331,7 +333,7 @@ case "${REQUEST_URI}" in
 	#
 	document_reference_query_field=$( echo "${QUERY_STRING}" | cut -d \& -f 1 )
 	document_reference="${document_reference_query_field#ref=}"
-        generateStatisticEntry 'documentation' "${document_reference}" "${AUTHENTICATE_UID}"
+        generateStatisticEntry "${AUTHENTICATE_UID}" 'documentation' "${document_reference}" "${AUTHENTICATE_UID}"
 
 	cp "${in_file}" "${corrected_in_file}"
 	;;
@@ -343,7 +345,7 @@ case "${REQUEST_URI}" in
 	jvin_field_in_body=$( sed -e '/VIN_OK_BUTTON/s/.*jvin=\([^\&]*\).*/\1/' "${in_file}" )
 	if [[ -n "${jvin_field_in_body}" ]]
 	then
-            generateStatisticEntry 'vin' "${jvin_field_in_body}" "${AUTHENTICATE_UID}"
+            generateStatisticEntry "${AUTHENTICATE_UID}" 'vin' "${jvin_field_in_body}"
 	fi
 
 	cp "${in_file}" "${corrected_in_file}"
