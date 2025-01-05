@@ -184,6 +184,16 @@ checkUserpassword ()
 # TODO: better test of the directory
 mkdir -p "${STAT_DATA_DIR}"
 
+escapedString ()
+{
+    unescaped_string="$1"
+
+    escaped_string=$( printf '%q' "${unescaped_string}" )
+
+    echo -e "'${escaped_string}'"
+}
+
+
 generateStatisticEntry ()
 {
     local user="$1"
@@ -209,8 +219,7 @@ generateStatisticEntry ()
     (
 	# use date since epoch to easy line sorting later
         local stat_date=$( date '+%s' )
-	#FIXME: we suppose that no "'" is contained in the various fiels
-        echo "\'${stat_date}\' \'${user}\' \'${action}\' \'${param}\' \'${status}\' \'${HTTP_X_REAL_IP}\' \'${HTTP_USER_AGENT}\'"
+        echo "'${stat_date}' $( escapedString ${user}) '${action}' $( escapedString ${param}) $( escapedString ${status}) $( escapedString ${HTTP_X_REAL_IP}) $( escapedString ${HTTP_USER_AGENT})"
     ) > "${stat_file}"
 }
 
