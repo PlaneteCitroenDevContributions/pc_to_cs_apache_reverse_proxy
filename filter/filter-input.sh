@@ -190,7 +190,7 @@ escapedString ()
 
     escaped_string=$( printf '%q' "${unescaped_string}" )
 
-    echo -e "'${escaped_string}'"
+    echo -e "${escaped_string}"
 }
 
 
@@ -219,7 +219,7 @@ generateStatisticEntry ()
     (
 	# use date since epoch to easy line sorting later
         local stat_date=$( date '+%s' )
-        echo "'${stat_date}' $( escapedString ${user}) '${action}' $( escapedString ${param}) $( escapedString ${status}) $( escapedString ${HTTP_X_REAL_IP}) $( escapedString ${HTTP_USER_AGENT})"
+        echo -e ${stat_date} $( escapedString "${user}") ${action} $( escapedString "${param}") $( escapedString "${status}") $( escapedString "${HTTP_X_REAL_IP}") $( escapedString "${HTTP_USER_AGENT}")
     ) > "${stat_file}"
 }
 
