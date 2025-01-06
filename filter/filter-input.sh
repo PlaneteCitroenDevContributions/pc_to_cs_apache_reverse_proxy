@@ -329,7 +329,7 @@ case "${REQUEST_URI}" in
 
 	if [[ -n "${AUTHENTICATE_UID}" ]]
 	then
-	    generateStatisticEntry "${AUTHENTICATE_UID}" 'login' "${REMOTE_USER}" 'success'
+	    generateStatisticEntry "${AUTHENTICATE_UID}" 'login' 'success'
 	else
 	    generateStatisticEntry '_unknown_user_' 'login' 'Internal error: missing AUTHENTICATE_UID' 'fail'
 	fi
