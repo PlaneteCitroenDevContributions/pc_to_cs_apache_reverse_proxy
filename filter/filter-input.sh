@@ -219,7 +219,7 @@ generateStatisticEntry ()
     (
 	# use date since epoch to easy line sorting later
         local stat_date=$( date '+%s' )
-        echo -e ${stat_date} $( escapedString "${user}") ${action} $( escapedString "${param}") $( escapedString "${status}") $( escapedString "${HTTP_X_REAL_IP}") $( escapedString "${HTTP_USER_AGENT}")
+        echo -e \"${stat_date}\" \"$( escapedString "${user}")\" \"${action}\" \"$( escapedString "${param}")\" \"$( escapedString "${status}")\" \"$( escapedString "${HTTP_X_REAL_IP}")\" \"$( escapedString "${HTTP_USER_AGENT}")\"
     ) > "${stat_file}"
 }
 
@@ -329,7 +329,7 @@ case "${REQUEST_URI}" in
 
 	if [[ -n "${AUTHENTICATE_UID}" ]]
 	then
-	    generateStatisticEntry "${AUTHENTICATE_UID}" 'login' 'success'
+	    generateStatisticEntry "${AUTHENTICATE_UID}" 'login' "${REMOTE_USER}" 'success'
 	else
 	    generateStatisticEntry '_unknown_user_' 'login' 'Internal error: missing AUTHENTICATE_UID' 'fail'
 	fi
