@@ -343,7 +343,7 @@ case "${REQUEST_URI}" in
 	#
 	document_reference_query_field=$( echo "${QUERY_STRING}" | cut -d \& -f 1 )
 	document_reference="${document_reference_query_field#ref=}"
-        generateStatisticEntry "${AUTHENTICATE_UID}" 'documentation' "${document_reference}" "${AUTHENTICATE_UID}"
+        generateStatisticEntry "${AUTHENTICATE_UID}" 'documentation' "${document_reference}"
 
 	cp "${in_file}" "${corrected_in_file}"
 	;;
