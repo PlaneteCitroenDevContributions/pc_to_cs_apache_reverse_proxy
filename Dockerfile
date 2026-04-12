@@ -4,6 +4,7 @@ RUN apt-get update \
     && \
     apt-get -y install \
        libapache2-mod-auth-openidc \
+       libapache2-mod-oauth2 \
     && \
     apt-get clean
 
