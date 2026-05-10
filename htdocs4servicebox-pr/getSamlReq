@@ -342,7 +342,7 @@ HTTP_REQ=$( curl \
 
 echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_servicebox_url_response.txt"
 
-USERID=$( echo "${HTTP_REQ}" | getHeaderValueFor 'userId' )
+USERID=$( echo "${HTTP_REQ}" | getHeaderValueFor 'REMOTE_USER' )
 SESSIONID=$( echo "${HTTP_REQ}" | getHeaderValueFor 'sessionId' )
 
 #
