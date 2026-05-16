@@ -41,7 +41,7 @@ then
     fi
 fi
 
-: ${TRACE_DIR:="${_debug_dir}"}
+: ${TRACE_DIR:="${_debug_dir_}"}
 
 trace ()
 {
