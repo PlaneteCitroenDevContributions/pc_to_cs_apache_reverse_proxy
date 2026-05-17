@@ -14,12 +14,18 @@ then
     then
 	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
 	_document_uri_to_system_path_=$( urlencode "${DOCUMENT_URI}" )
-	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%s' )-${_document_uri_to_system_path_}-request"
+	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%H-%M-%S' )-${_document_uri_to_system_path_}"
+	_trace_dir_="${_debug_dir_}"
+
 	mkdir -m 777 -p "${_debug_dir_}"
 
+	# test if all the folders are OK
+
+	# 1. stderr redirection
 	: ${STDERR:="${_debug_dir_}/stderr.txt"}
 	if echo '' >> "${STDERR}"
 	then
+	    # OK
 	    :
 	else
 	    # invalidate _debug_dir_
@@ -28,26 +34,38 @@ then
 	fi
 	echo "Redirect stderr to ${STDERR}" 1>&2
 	exec 2>>"${STDERR}"
-	
-	: ${trace_file:="${_debug_dir_}/trace.txt"}
-	if echo '' >> "${trace_file}"
+
+	# 2. _trace_dir_
+	: ${_trace_file_:="${_trace_dir_}/trace.txt"}
+	if echo '' >> "${_trace_file_}"
 	then
+	    # OK
 	    :
 	else
-	    # invalidate _debug_dir_
-	    _debug_dir_=''
-	    trace_file="/dev/stderr"
+	    # invalidate _debug_file_
+	    _trace_file_="/dev/stderr"
+	    # _trace_dir_ may by wrong too
+	    _trace_dir='/tmp'
 	fi
     fi
 fi
-
-: ${TRACE_DIR:="${_debug_dir_}"}
 
 logInfo ()
 {
     echo "$@" | while read -r line
     do
-       echo '===> '"${line}" 1>&2
+       echo '===>[INFO] '"${line}" >> "${STDERR}"
+    done
+}
+
+# default values if not previously set
+: ${_trace_dir_:='/tmp'}
+: ${_trace_file_:='/dev/stderr'}
+logTrace ()
+{
+    echo "$@" | while read -r line
+    do
+       echo '===>[TRACE] '"${line}" >> "${_trace_file_}"
     done
 }
 
@@ -182,7 +200,7 @@ HTTP_REQ=$( curl \
 		sed -e 's/\r$//'
 	)
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_getSamlReq_response.txt"
+echo "${HTTP_REQ}" > "${_trace_dir_}/HTTP_REQ_getSamlReq_response.txt"
 
 GIGYAURL=$( echo "${HTTP_REQ}" | getHeaderValueFor 'gigyaUrl' )
 
@@ -216,7 +234,7 @@ HTTP_REQ=$( curl \
 		sed -e 's/\r$//'
 	)
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL_followed_response.txt"
+echo "${HTTP_REQ}" > "${_trace_dir_}/HTTP_REQ_GIGYAURL_followed_response.txt"
 
 _locationHeader=$( echo "${HTTP_REQ}" | getHeaderValueFor 'location' )
 SAMLCONTEXT=$( echo "${_locationHeader}" | sed -n -e 's/.*&samlContext=\([^&]*\).*/\1/p' )
@@ -238,7 +256,7 @@ HTTP_REQ=$( curl \
 		sed -e 's/\r$//'
 	)
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_webSdkBootstrap_response.txt"
+echo "${HTTP_REQ}" > "${_trace_dir_}/HTTP_REQ_webSdkBootstrap_response.txt"
 
 GMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*gmid=/s/[^=]*=\([^;]*\);.*$/\1/p')
 UCID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*ucid=/s/[^=]*=\([^;]*\);.*$/\1/p')
@@ -286,7 +304,7 @@ HTTP_REQ=$( curl \
 		sed -e 's/\r$//'
 	)
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_accounts_login_response.txt"
+echo "${HTTP_REQ}" > "${_trace_dir_}/HTTP_REQ_accounts_login_response.txt"
 
 GLT=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*glt_/s/.*\(glt_[^;]*\);.*/\1/p')
 LOGIN_TOKEN=$(echo "${GLT}" | sed -n -e 's/[^=]*=//p')
@@ -311,7 +329,7 @@ HTTP_REQ=$( curl \
 		sed -e 's/\r$//'
 	)
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_continue_response.txt"
+echo "${HTTP_REQ}" > "${_trace_dir_}/HTTP_REQ_continue_response.txt"
 
 SAMLRESPONSE=$(echo "${HTTP_REQ}" | sed -n -e '/name="SAMLResponse"/s/.*name="SAMLResponse"[ \t]*value="\([^"]*\)".*/\1/p' )
 SERVICEBOX_URL=$(echo "${HTTP_REQ}" | sed -n -e '/name="SAMLResponse"/s/.*id="selfForm"[ \t]*method="post"[ \t]*action="\([^"]*\)".*/\1/p' )
@@ -340,7 +358,7 @@ HTTP_REQ=$( curl \
 		sed -e 's/\r$//'
 	    )
 
-echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_servicebox_url_response.txt"
+echo "${HTTP_REQ}" > "${_trace_dir_}/HTTP_REQ_servicebox_url_response.txt"
 
 USERID=$( echo "${HTTP_REQ}" | getHeaderValueFor 'REMOTE_USER' )
 SESSIONID=$( echo "${HTTP_REQ}" | getHeaderValueFor 'sessionId' )
