@@ -17,13 +17,13 @@ then
 	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%H-%M-%S' )-${_document_uri_to_system_path_}"
 	_trace_dir_="${_debug_dir_}"
 
-	mkdir -m 777 -p "${_debug_dir_}"
+	mkdir -m 777 -p "${_debug_dir_}" 2>/dev/null
 
 	# test if all the folders are OK
 
 	# 1. stderr redirection
 	: ${STDERR:="${_debug_dir_}/stderr.txt"}
-	if echo '' >> "${STDERR}"
+	if ( echo '' >> "${STDERR}" ) 2>/dev/null
 	then
 	    # OK
 	    :
@@ -37,7 +37,7 @@ then
 
 	# 2. _trace_dir_
 	: ${_trace_file_:="${_trace_dir_}/trace.txt"}
-	if echo '' >> "${_trace_file_}"
+	if ( echo '' >> "${_trace_file_}" ) 2>/dev/null
 	then
 	    # OK
 	    :
@@ -50,6 +50,8 @@ then
     fi
 fi
 
+# FIXME: this should use an _info_file_ var
+: ${STDERR:='/dev/stderr'}
 logInfo ()
 {
     echo "$@" | while read -r line
@@ -97,6 +99,8 @@ urlencode() {
 
     LC_COLLATE=$old_lc_collate
 }
+
+exit 1
 
 getHeaderValueFor ()
 {
