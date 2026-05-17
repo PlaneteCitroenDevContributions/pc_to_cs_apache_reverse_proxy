@@ -23,6 +23,12 @@ services:
         - ./pc_stats/:/var/pc_stats/:rw
         - ./DEBUG/filter/:/var/pc_debug/:rw
 
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: 3
+
 volumes:
 
    NEXTCLOUD_EXTERNAL_STORAGE1:
