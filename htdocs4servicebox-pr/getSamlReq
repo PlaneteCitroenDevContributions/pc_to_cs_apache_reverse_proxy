@@ -100,8 +100,6 @@ urlencode() {
     LC_COLLATE=$old_lc_collate
 }
 
-exit 1
-
 getHeaderValueFor ()
 {
     header_regexpr_pattern="$1"
