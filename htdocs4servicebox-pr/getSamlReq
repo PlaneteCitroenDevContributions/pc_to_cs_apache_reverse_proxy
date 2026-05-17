@@ -43,7 +43,7 @@ fi
 
 : ${TRACE_DIR:="${_debug_dir_}"}
 
-trace ()
+logInfo ()
 {
     echo "$@" | while read -r line
     do
@@ -51,10 +51,10 @@ trace ()
     done
 }
 
-trace '=============================================================================='
-trace "$( date )"
-trace "$( env )"
-trace '=============================================================================='
+logInfo '=============================================================================='
+logInfo "$( date )"
+logInfo "$( env )"
+logInfo '=============================================================================='
 
 HERE=$( dirname "$0" )
 
@@ -163,9 +163,9 @@ do
 done
 IFS="${_old_IFS}"
 
-trace "Has SET_JSESSIONID: ${SET_JSESSIONID}"
-trace "Has SET_PSA_COUNTRY: ${SET_PSA_COUNTRY}"
-trace "Has SET_BIGIPSERVER: ${SET_BIGIPSERVER}"
+logInfo "Has SET_JSESSIONID: ${SET_JSESSIONID}"
+logInfo "Has SET_PSA_COUNTRY: ${SET_PSA_COUNTRY}"
+logInfo "Has SET_BIGIPSERVER: ${SET_BIGIPSERVER}"
 
 
 HTTP_REQ=$( curl \
@@ -193,10 +193,10 @@ SAMLREQUEST_ENCODED=$( urlencode "${SAMLREQUEST}" )
 
 SAMLLOGOUTREQUEST=$( echo "${HTTP_REQ}" | getHeaderValueFor 'SAMLLogoutRequest' )
 
-trace "My GIGYAURL: ${GIGYAURL}"
-trace "My APIKEY: ${APIKEY}"
-trace "My SAMLREQUEST: ${SAMLREQUEST}"
-trace "My SAMLREQUEST_ENCODED: ${SAMLREQUEST_ENCODED}"
+logInfo "My GIGYAURL: ${GIGYAURL}"
+logInfo "My APIKEY: ${APIKEY}"
+logInfo "My SAMLREQUEST: ${SAMLREQUEST}"
+logInfo "My SAMLREQUEST_ENCODED: ${SAMLREQUEST_ENCODED}"
 
 #
 # call GIGYAURL
@@ -221,7 +221,7 @@ echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_GIGYAURL_followed_response.txt"
 _locationHeader=$( echo "${HTTP_REQ}" | getHeaderValueFor 'location' )
 SAMLCONTEXT=$( echo "${_locationHeader}" | sed -n -e 's/.*&samlContext=\([^&]*\).*/\1/p' )
 
-trace "My SAMLCONTEXT: ${SAMLCONTEXT}"
+logInfo "My SAMLCONTEXT: ${SAMLCONTEXT}"
 
 
 #
@@ -244,9 +244,9 @@ GMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*gmid=/s/[^=]*=\([^;]
 UCID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*ucid=/s/[^=]*=\([^;]*\);.*$/\1/p')
 HASGMID=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*has[gG]mid=/s/[^=]*=\([^;]*\);.*$/\1/p')
 
-trace "My GMID: $GMID"
-trace "My UCID: $UCID"
-trace "My HASGMID: $HASGMID"
+logInfo "My GMID: $GMID"
+logInfo "My UCID: $UCID"
+logInfo "My HASGMID: $HASGMID"
 
 #
 # call https://login-ra.fiat.com/accounts.webSdkBootstrap
@@ -255,7 +255,7 @@ trace "My HASGMID: $HASGMID"
 
 RISKCONTEXT=$( urlencode '{"b0":53295,"b1":[104,68,180,220],"b2":6,"b3":[],"b4":6,"b5":1,"b6":"'"${USERAGENT}"'","b7":[],"b8":"'"${TIME}"':00","b9":-120,"b10":{"state":"prompt"},"b11":false,"b12":{"charging":true,"chargingTime":0,"dischargingTime":null,"level":1},"b13":[null,"1024|728|24",false,true]}' )
 
-trace "RISKCONTEXT: ${RISKCONTEXT}"
+logInfo "RISKCONTEXT: ${RISKCONTEXT}"
 
 HTTP_REQ=$( curl \
 		-s \
@@ -291,8 +291,8 @@ echo "${HTTP_REQ}" > "${TRACE_DIR}/HTTP_REQ_accounts_login_response.txt"
 GLT=$(echo "${HTTP_REQ}" | sed -n -e '/^[sS]et-[cC]ookie:.*glt_/s/.*\(glt_[^;]*\);.*/\1/p')
 LOGIN_TOKEN=$(echo "${GLT}" | sed -n -e 's/[^=]*=//p')
 
-trace "My GLT: $GLT"
-trace "My LOGIN_TOKEN: $LOGIN_TOKEN"
+logInfo "My GLT: $GLT"
+logInfo "My LOGIN_TOKEN: $LOGIN_TOKEN"
 
 #
 # call https://login-ra.fiat.com/saml/v2.0/.../continue
@@ -317,8 +317,8 @@ SAMLRESPONSE=$(echo "${HTTP_REQ}" | sed -n -e '/name="SAMLResponse"/s/.*name="SA
 SERVICEBOX_URL=$(echo "${HTTP_REQ}" | sed -n -e '/name="SAMLResponse"/s/.*id="selfForm"[ \t]*method="post"[ \t]*action="\([^"]*\)".*/\1/p' )
 SAMLRESPONSE_ENCODED=$(urlencode "${SAMLRESPONSE}")
 
-trace "My SAMLRESPONSE: ${SAMLRESPONSE}"
-trace "My SERVICEBOX_URL: ${SERVICEBOX_URL}"
+logInfo "My SAMLRESPONSE: ${SAMLRESPONSE}"
+logInfo "My SERVICEBOX_URL: ${SERVICEBOX_URL}"
 
 #
 # final call to SERVICEBOX_URL
@@ -361,7 +361,7 @@ then
     echo 'Status: 500 Internal Server Error'
     echo
     
-    trace 'Return code 500'
+    logInfo 'Return code 500'
     exit 0
 else
 
@@ -378,7 +378,7 @@ else
     echo 'sessionId: '"${SESSIONID}"
     echo
 
-    trace "Return code 302 with LoginToken: ${LOGIN_TOKEN}"
+    logInfo "Return code 302 with LoginToken: ${LOGIN_TOKEN}"
     exit 0
 fi
 
