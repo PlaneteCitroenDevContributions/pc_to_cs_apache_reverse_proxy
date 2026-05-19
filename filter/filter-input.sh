@@ -123,6 +123,8 @@ fi
 in_file="/tmp/in.txt.$$"
 corrected_in_file="/tmp/corrected_in.txt.$$"
 
+logTrace "$( env )"
+
 #
 # save stdin to file
 #
