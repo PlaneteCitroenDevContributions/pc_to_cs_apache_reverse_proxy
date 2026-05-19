@@ -200,16 +200,24 @@ generateStatisticEntry ()
 # select behavior depending on URL
 #
 
+_guessed_authenticated_user_='_unknown_user_'
+
+if [[ -n "${AUTHENTICATE_UID}" ]]
+then
+    _guessed_authenticated_user_="${AUTHENTICATE_UID}"
+elif [[ -n "${OIDC_CLAIM_sub}" ]]
+then
+    _guessed_authenticated_user_="${OIDC_CLAIM_sub}"
+elif [[ -n "${REMOTE_USER}" ]]
+then
+    _guessed_authenticated_user_="${REMOTE_USER}"
+fi
+
 case "${REQUEST_URI}" in
 
     /do/login* ) # same as <Location "/do/login"> in http.conf
 
-	if [[ -n "${AUTHENTICATE_UID}" ]]
-	then
-	    generateStatisticEntry "${AUTHENTICATE_UID}" 'login' "${REMOTE_USER}" 'success'
-	else
-	    generateStatisticEntry '_unknown_user_' 'login' 'Internal error: missing AUTHENTICATE_UID' 'fail'
-	fi
+	generateStatisticEntry "${_guessed_authenticated_user_}" 'login' "${REMOTE_USER}" 'success'
 
 	cp "${in_file}" "${corrected_in_file}"
 	;;
@@ -220,7 +228,7 @@ case "${REQUEST_URI}" in
 	#
 	document_reference_query_field=$( echo "${QUERY_STRING}" | cut -d \& -f 1 )
 	document_reference="${document_reference_query_field#ref=}"
-        generateStatisticEntry "${AUTHENTICATE_UID}" 'documentation' "${document_reference}"
+        generateStatisticEntry "${_guessed_authenticated_user_}" 'documentation' "${document_reference}"
 
 	cp "${in_file}" "${corrected_in_file}"
 	;;
@@ -232,7 +240,7 @@ case "${REQUEST_URI}" in
 	jvin_field_in_body=$( sed -e '/VIN_OK_BUTTON/s/.*jvin=\([^\&]*\).*/\1/' "${in_file}" )
 	if [[ -n "${jvin_field_in_body}" ]]
 	then
-            generateStatisticEntry "${AUTHENTICATE_UID}" 'vin' "${jvin_field_in_body}"
+            generateStatisticEntry "${_guessed_authenticated_user_}" 'vin' "${jvin_field_in_body}"
 	fi
 
 	cp "${in_file}" "${corrected_in_file}"
