@@ -13,7 +13,6 @@ services:
 
      labels: # add directly Traefik config to prevent additionnal socat
         - "traefik.enable=true"
-#!!!        - "traefik.http.routers.servicebox-dev.rule=Host(`dev.servicebox.forumtestplanetecitroen.fr`)"
         - "traefik.http.routers.servicebox-dev.rule=Host(`servicebox-dev.forumtestplanetecitroen.fr`)"
         - "traefik.http.routers.servicebox-dev.tls=true"
         - "traefik.http.routers.servicebox-dev.tls.certresolver=letsencrypt-resolver"
@@ -21,7 +20,7 @@ services:
 
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential-plus.txt
-        - SHELL_DEBUG=yes
+#!!        - SHELL_DEBUG=yes
 
      command:
         - httpd-foreground
