@@ -9,7 +9,7 @@ then
     source "${0}.env.secret"
 fi
 
-if [[ -n "${SHELL_DEBUG}" ]]
+if [[ -n "XXXXXX${SHELL_DEBUG}" ]]
 then
     set -x
 fi
@@ -101,14 +101,13 @@ else
     _trace_file_='/dev/stderr'
 fi
     
-
 # FIXME: this should use an _info_file_ var
 logInfo ()
 {
     echo "$@" | while read -r line
     do
-       echo '===>[INFO] '"${line}" >> "${STDERR}"
-    done
+       echo '===>[INFO] '"${line}"
+    done >> "${STDERR}"
 }
 
 # default values if not previously set
@@ -116,14 +115,14 @@ logTrace ()
 {
     echo "$@" | while read -r line
     do
-       echo '===>[TRACE] '"${line}" >> "${_trace_file_}"
-    done
+       echo '===>[TRACE] '"${line}"
+    done >> "${_trace_file_}"
 }
 
-logInfo '=============================================================================='
-logInfo "$( date )"
-logInfo "$( env )"
-logInfo '=============================================================================='
+logTrace '=============================================================================='
+logTrace "$( date )"
+logTrace "$( env )"
+logTrace '=============================================================================='
 
 #
 # global definitions
