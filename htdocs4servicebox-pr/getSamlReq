@@ -2,10 +2,56 @@
 
 # -*- mode: shell-script -*-
 
+HERE=$( dirname "$0" )
+
 if [[ -r "${0}.env.secret" ]]
 then
     source "${0}.env.secret"
 fi
+
+# Utilities
+# =========
+urlencode() {
+    # urlencode <string>
+
+    old_lc_collate=$LC_COLLATE
+    LC_COLLATE=C
+
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:$i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-])
+		printf '%s' "$c"
+		;;
+            *)
+		printf '%%%02X' "'$c"
+		;;
+        esac
+    done
+
+    LC_COLLATE=$old_lc_collate
+}
+
+getHeaderValueFor ()
+{
+    header_regexpr_pattern="$1"
+
+    line_containing_header=$(
+	grep \
+	    --ignore-case \
+	    --regexp="${header_regexpr_pattern}:"
+			 )
+
+    header_value=$(
+	echo "${line_containing_header}" | \
+	    sed -n -e 's/[^:]*:[ \t]*\(.*\)$/\1/p'
+		)
+
+    echo "${header_value}"
+}
+
+# =========
 
 if [[ -n "${FILTER_DEBUG}" ]]
 then
@@ -13,7 +59,7 @@ then
     if [[ "${FILTER_DEBUG}" == "file" ]]
     then
 	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
-	_document_uri_to_system_path_=$( urlencode "${DOCUMENT_URI}" )
+	_document_uri_to_system_path_=$( urlencode "${REQUEST_URI}" )
 	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%H-%M-%S' )-${_document_uri_to_system_path_}"
 	_trace_dir_="${_debug_dir_}"
 
@@ -75,49 +121,6 @@ logInfo '=======================================================================
 logInfo "$( date )"
 logInfo "$( env )"
 logInfo '=============================================================================='
-
-HERE=$( dirname "$0" )
-
-urlencode() {
-    # urlencode <string>
-
-    old_lc_collate=$LC_COLLATE
-    LC_COLLATE=C
-
-    local length="${#1}"
-    for (( i = 0; i < length; i++ )); do
-        local c="${1:$i:1}"
-        case $c in
-            [a-zA-Z0-9.~_-])
-		printf '%s' "$c"
-		;;
-            *)
-		printf '%%%02X' "'$c"
-		;;
-        esac
-    done
-
-    LC_COLLATE=$old_lc_collate
-}
-
-getHeaderValueFor ()
-{
-    header_regexpr_pattern="$1"
-
-    line_containing_header=$(
-	grep \
-	    --ignore-case \
-	    --regexp="${header_regexpr_pattern}:"
-			 )
-
-    header_value=$(
-	echo "${line_containing_header}" | \
-	    sed -n -e 's/[^:]*:[ \t]*\(.*\)$/\1/p'
-		)
-
-    echo "${header_value}"
-}
-
 
 #
 # global definitions
