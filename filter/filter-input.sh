@@ -123,76 +123,19 @@ fi
 in_file="/tmp/in.txt.$$"
 corrected_in_file="/tmp/corrected_in.txt.$$"
 
-: ${check_pc_user_pgm:="${HERE}/checkCloudAgendaUser.sh"}
-
-#
-# TODO: all the credential management is done outside
-# So, all the following code may be removed in the future
-#
-
-# #
-# # get cs credentials from credential file
-# #
-
-# credential_file_effective_content=$(
-#     sed -e '/^[ \t]*#/d' "${CREDENTIAL_FILE}"
-# )
-
-# : ${CREDENTIAL_FILE:="${HERE}/cs_credential.txt"}
-# cs_login=$(
-#     grep 'cs_login' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
-# )
-
-# cs_password=$(
-#     grep 'cs_password' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
-# 	   )
-
-# cs_ldap_filter_group1=$(
-#     grep 'filter_group1' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
-# 	   )
-
-# cs_ldap_filter_group2=$(
-#     grep 'filter_group2' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
-# 	   )
-
-# cs_ldap_filter_group3=$(
-#     grep 'filter_group3' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
-# 	   )
-
-# cs_ldap_filter_group4=$(
-#     grep 'filter_group4' <<< "${credential_file_effective_content}" | cut -d '=' -f 2 | tr -d ' '
-# 	   )
-
-# # TODO:
-# # - add ldap group filter
-# # - better filter for value: echo "${x}" | sed -e 's/^\ *//' -e 's/ *$//'
-
-
-# if [[ -z "${cs_login}" ]]
-# then
-#     #TODO: test it
-#     cs_login='unintialized'
-# fi
-# if [[ -z "${cs_password}" ]]
-# then
-#     cs_password='unintialized'
-# fi
-
-# TODO; END OF previous TODO
-
 #
 # save stdin to file
 #
 
 cat - > "${in_file}"
 
-url_decode ()
-{
-    url_encoded_string="$1"
-    url_decoded_string=$( urlencode -d "${url_encoded_string}" )
+# url_decode ()
+# {
+#     url_encoded_string="$1"
+#     url_decoded_string=$( urlencode -d "${url_encoded_string}" )
 
-    echo -n "${url_decoded_string}"
-}
+#     echo -n "${url_decoded_string}"
+# }
 
 checkUsername ()
 {
@@ -305,19 +248,15 @@ generateStatisticEntry ()
 # =====
 #
 
-if [[ -n "${trace_file}" ]]
-then
-
-    (
-	echo 'vvvvvvvvvvvvvvvvvvvvvvv'
-	date
-	export
-	echo -n '===========================================>'
-	cat "${in_file}"
-	echo '<==========================================='
-	echo '-----------------------'
-    ) >> "${trace_file}"
-fi
+(
+    echo 'vvvvvvvvvvvvvvvvvvvvvvv'
+    date
+    export
+    echo -n '===========================================>'
+    cat "${in_file}"
+    echo '<==========================================='
+    echo '-----------------------'
+) > "${_debug_dir_}/in_file.txt"
 
 #
 # MAIN
@@ -443,27 +382,24 @@ case "${REQUEST_URI}" in
 	;;
 esac
 
-if [[ -n "${trace_file}" ]]
-then
-    (
-	echo -n '++++++++++++++++++++++++++++++++++++>'
-	cat "${corrected_in_file}"
-	echo '<++++++++++++++++++++++++++++++++++++'
-	echo "Got username: ${username}"
-	echo "Used elapseTimeUserName: ${elapseTimeUserName}"
-	echo "Got userid: ${userid}"
-	echo "Used loginUserid: ${loginUserid}"
-	echo "Got password: ${password}"
-	echo "Used loginPassword: ${loginPassword}"
-	echo '^^^^^^^^^^^^^^^^^^^^^^^^'
-    ) >> "${trace_file}"
-fi
+#
+# DEBUG
+# =====
+#
+
+(
+    echo -n '++++++++++++++++++++++++++++++++++++>'
+    cat "${corrected_in_file}"
+    echo '<++++++++++++++++++++++++++++++++++++'
+    echo "Got username: ${username}"
+    echo "Used elapseTimeUserName: ${elapseTimeUserName}"
+    echo "Got userid: ${userid}"
+    echo "Used loginUserid: ${loginUserid}"
+    echo "Got password: ${password}"
+    echo "Used loginPassword: ${loginPassword}"
+    echo '^^^^^^^^^^^^^^^^^^^^^^^^'
+) > "${_debug_dir_}/corrected_in_file.txt"
 
 cat "${corrected_in_file}"
-
-if [[ -n "${_debug_dir_}" ]]
-then
-    cp "${in_file}" "${corrected_in_file}" "${_debug_dir_}"
-fi
 
 rm -f "${in_file}" "${corrected_in_file}"
