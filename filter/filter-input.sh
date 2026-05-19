@@ -202,60 +202,6 @@ case "${REQUEST_URI}" in
 
     /do/login* ) # same as <Location "/do/login"> in http.conf
 
-	# TODO:
-	# the behavior between GET and POST method is not the same
-	# should be check at the begining to orient execution
-	#
-
-	# TODO: check that this code is no more necessary after migration to SAML login
-	#
-	# => user check process is no more used
-
-
-	# #
-	# # get provided credentials from the body
-	# #
-	# userid=$(
-	#     sed -e 's/.*&userid=\([^&]*\)&.*/\1/' "${in_file}"
-	#       )
-	# password=$(
-	#     sed -e 's/.*&password=\([^&]*\)&.*/\1/' "${in_file}"
-	# 	)
-
-	# if [[ -z "${userid}" ]]
-	# then
-	#     #
-	#     # login request does not contain any userid
-	#     # this request seems to be used to configure the login page
-	#     #
-
-	#     # we keep the content unchanged
-	#     cp "${in_file}" "${corrected_in_file}"
-	# else
-
-	#     #
-	#     # effective login/password test
-	#     # =>
-	#     #    * check if user is allowed on PC side
-	#     #    * if so, replace with the valid ServiceBox credentials
-
-	#     pc_login_success=false
-	#     loginUserid="bad_planete_citroen_association_login_${username}"
-	#     loginPassword="bad_planete_citroen_association_password_${password}"
-	#     if checkUsername "${userid}"
-	#     then
-	# 	url_decoded_user_id=$( url_decode "${userid}" )
-	# 	url_decoded_password=$( url_decode "${password}" )
-	# 	if checkUserpassword "${url_decoded_user_id}" "${url_decoded_password}"
-	# 	then
-	# 	    loginUserid="${cs_login}"
-	# 	    loginPassword="${cs_password}"
-	# 	    pc_login_success=true
-	# 	fi
-	#     fi
-
-	#     sed -e 's/&userid=[^&]*&password=[^&]*&/\&userid='${loginUserid}'\&password='${loginPassword}'\&/' "${in_file}" > "${corrected_in_file}"
-
 	if [[ -n "${AUTHENTICATE_UID}" ]]
 	then
 	    generateStatisticEntry "${AUTHENTICATE_UID}" 'login' "${REMOTE_USER}" 'success'
