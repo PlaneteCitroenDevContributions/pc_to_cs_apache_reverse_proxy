@@ -9,7 +9,7 @@ then
     source "${0}.env.secret"
 fi
 
-if [[ -n "XXXXXX${SHELL_DEBUG}" ]]
+if [[ -n "${SHELL_DEBUG}" ]]
 then
     set -x
 fi
@@ -84,7 +84,7 @@ then
     exec 2>>"${STDERR}"
 
     # 2. _log_files_dir_
-    : ${_log_file_:="${_log_files_dir_}/trace.txt"}
+    : ${_log_file_:="${_log_files_dir_}/log.txt"}
     if ( echo '' >> "${_log_file_}" ) 2>/dev/null
     then
 	# OK
