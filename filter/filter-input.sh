@@ -129,76 +129,25 @@ corrected_in_file="/tmp/corrected_in.txt.$$"
 
 cat - > "${in_file}"
 
-# url_decode ()
-# {
-#     url_encoded_string="$1"
-#     url_decoded_string=$( urlencode -d "${url_encoded_string}" )
+#
+# DEBUG
+# =====
+#
 
-#     echo -n "${url_decoded_string}"
-# }
+(
+    echo 'vvvvvvvvvvvvvvvvvvvvvvv'
+    date
+    export
+    echo -n '===========================================>'
+    cat "${in_file}"
+    echo '<==========================================='
+    echo '-----------------------'
+) > "${_debug_dir_}/in_file.txt"
 
-checkUsername ()
-{
-    username=$1
-
-    # bypass
-    return 0
-    # NOT REACHED
-
-    case "${username}" in
-
-	"pc1" )
-	    # FIXME: to remove
-	    : # nop
-	    ;;
-	"pc2")
-	    return 0
-	    ;;
-	*)
-	    return 1
-	    ;;
-    esac
-
-}
-	
-checkUserpassword ()
-{
-    username="$1"
-    password="$2"
-
-    check_result=false
-
-    if [[ -n "${_CREDENTIONAL_DEBUG_}" ]]
-    then
-	case "${username}" in
-
-	    "pc1" )
-		if [[ "${password}" == "pc1pass" ]]
-		then
-		    return 0
-		fi
-		;;
-	    "pc2")
-		if [[ "${password}" == "pc2pass" ]]
-		then
-		    return 0
-		fi
-		;;
-	esac
-    fi
-
-    if "${check_pc_user_pgm}" "${username}" "${password}" "${cs_ldap_filter_group1}" "${cs_ldap_filter_group2}" "${cs_ldap_filter_group3}" "${cs_ldap_filter_group4}"
-    then
-	return 0
-    else
-	return 1
-    fi
-
-}
 
 #
-# add statistic entry
-# ===================
+# stat utilities
+# ==============
 
 : ${STAT_DATA_DIR:="/var/pc_stats"}
 # TODO: better test of the directory
@@ -212,7 +161,6 @@ escapedString ()
 
     echo -e "${escaped_string}"
 }
-
 
 generateStatisticEntry ()
 {
@@ -244,48 +192,13 @@ generateStatisticEntry ()
 }
 
 #
-# DEBUG
-# =====
-#
-
-(
-    echo 'vvvvvvvvvvvvvvvvvvvvvvv'
-    date
-    export
-    echo -n '===========================================>'
-    cat "${in_file}"
-    echo '<==========================================='
-    echo '-----------------------'
-) > "${_debug_dir_}/in_file.txt"
-
-#
 # MAIN
 # ====
 #
 # select behavior depending on URL
 #
 
-
 case "${REQUEST_URI}" in
-
-    # TODO: check that this code is no more necessary after migration to SAML login
-    #
-    # => user check process is no more used
-    #
-    # "/elapseTime" )
-    # 	body=$( cat "${in_file}" )
-    # 	#content = username=XXXXX
-    # 	username=${body#username=}
-
-    # 	if checkUsername "${username}"
-    # 	then
-    # 	    elapseTimeUserName="${cs_login}"
-    # 	else
-    # 	    elapseTimeUserName="bad_planete_citroen_assosiation_login_${username}"
-    # 	fi
-
-    # 	sed -e 's/username=.*$/username='${elapseTimeUserName}'/' "${in_file}" > "${corrected_in_file}"
-    # 	;;
 
     /do/login* ) # same as <Location "/do/login"> in http.conf
 
