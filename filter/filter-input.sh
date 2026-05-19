@@ -57,7 +57,7 @@ if [[ "${FILTER_DEBUG}" == "file" ]]
 then
     : ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
     _document_uri_to_system_path_=$( urlencode "${REQUEST_URI}" )
-    _debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%s' )-${_document_uri_to_system_path_}-request"
+    _debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%H-%M-%S' )-${_document_uri_to_system_path_}-request"
     _log_files_dir_="${_debug_dir_}"
 
     mkdir -m 777 -p "${_debug_dir_}" 2>/dev/null
