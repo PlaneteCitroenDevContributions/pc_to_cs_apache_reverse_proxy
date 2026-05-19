@@ -21,6 +21,7 @@ services:
 
      environment:
         - CREDENTIAL_FILE=/etc/pcrproxy/SECRETs/cs_credential-plus.txt
+        - SHELL_DEBUG=yes
 
      command:
         - httpd-foreground
