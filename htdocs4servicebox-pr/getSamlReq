@@ -9,6 +9,11 @@ then
     source "${0}.env.secret"
 fi
 
+if [[ -n "${SHELL_DEBUG}" ]]
+then
+    set -x
+fi
+
 # Utilities
 # =========
 urlencode() {
@@ -53,51 +58,51 @@ getHeaderValueFor ()
 
 # =========
 
-if [[ -n "${FILTER_DEBUG}" ]]
+if [[ "${FILTER_DEBUG}" == "file" ]]
 then
-    set -x
-    if [[ "${FILTER_DEBUG}" == "file" ]]
+    : ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
+    _document_uri_to_system_path_=$( urlencode "${REQUEST_URI}" )
+    _debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%H-%M-%S' )-${_document_uri_to_system_path_}"
+    _trace_dir_="${_debug_dir_}"
+
+    mkdir -m 777 -p "${_debug_dir_}" 2>/dev/null
+
+    # test if all the folders are OK
+
+    # 1. stderr redirection
+    : ${STDERR:="${_debug_dir_}/stderr.txt"}
+    if ( echo '' >> "${STDERR}" ) 2>/dev/null
     then
-	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
-	_document_uri_to_system_path_=$( urlencode "${REQUEST_URI}" )
-	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%H-%M-%S' )-${_document_uri_to_system_path_}"
-	_trace_dir_="${_debug_dir_}"
-
-	mkdir -m 777 -p "${_debug_dir_}" 2>/dev/null
-
-	# test if all the folders are OK
-
-	# 1. stderr redirection
-	: ${STDERR:="${_debug_dir_}/stderr.txt"}
-	if ( echo '' >> "${STDERR}" ) 2>/dev/null
-	then
-	    # OK
-	    :
-	else
-	    # invalidate _debug_dir_
-	    _debug_dir_=''
-	    STDERR=/dev/stderr
-	fi
-	echo "Redirect stderr to ${STDERR}" 1>&2
-	exec 2>>"${STDERR}"
-
-	# 2. _trace_dir_
-	: ${_trace_file_:="${_trace_dir_}/trace.txt"}
-	if ( echo '' >> "${_trace_file_}" ) 2>/dev/null
-	then
-	    # OK
-	    :
-	else
-	    # invalidate _debug_file_
-	    _trace_file_="/dev/stderr"
-	    # _trace_dir_ may by wrong too
-	    _trace_dir='/tmp'
-	fi
+	# OK
+	:
+    else
+	# invalidate _debug_dir_
+	_debug_dir_=''
+	STDERR=/dev/stderr
     fi
+    echo "Redirect stderr to ${STDERR}" 1>&2
+    exec 2>>"${STDERR}"
+
+    # 2. _trace_dir_
+    : ${_trace_file_:="${_trace_dir_}/trace.txt"}
+    if ( echo '' >> "${_trace_file_}" ) 2>/dev/null
+    then
+	# OK
+	:
+    else
+	# invalidate _debug_file_
+	_trace_file_="/dev/stderr"
+	# _trace_dir_ may by wrong too
+	_trace_dir='/tmp'
+    fi
+else
+    STDERR='/dev/stderr'
+    _trace_dir_='/tmp'
+    _trace_file_='/dev/stderr'
 fi
+    
 
 # FIXME: this should use an _info_file_ var
-: ${STDERR:='/dev/stderr'}
 logInfo ()
 {
     echo "$@" | while read -r line
@@ -107,8 +112,6 @@ logInfo ()
 }
 
 # default values if not previously set
-: ${_trace_dir_:='/tmp'}
-: ${_trace_file_:='/dev/stderr'}
 logTrace ()
 {
     echo "$@" | while read -r line
