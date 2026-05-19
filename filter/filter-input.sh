@@ -4,39 +4,116 @@ HERE=$( dirname "$0" )
 PGM_BASENAME=$( basename "$0" )
 ENV_FILE="${HERE}/env-${PGM_BASENAME}"
 
-if [[ -n "${FILTER_DEBUG}" ]]
+if [[ -n "${SHELL_DEBUG}" ]]
 then
     set -x
-    if [[ "${FILTER_DEBUG}" == "file" ]]
-    then
-	: ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
-	_document_uri_to_system_path_=$( urlencode "${DOCUMENT_URI}" )
-	_debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%s' )-${_document_uri_to_system_path_}-request"
-	mkdir -m 777 -p "${_debug_dir_}"
-
-	: ${STDERR:="${_debug_dir_}/stderr.txt"}
-	if echo '' >> "${STDERR}"
-	then
-	    :
-	else
-	    # invalidate _debug_dir_
-	    _debug_dir_=''
-	    STDERR=/dev/stderr
-	fi
-	echo "Redirect stderr to ${STDERR}" 1>&2
-	exec 2>>"${STDERR}"
-	
-	: ${trace_file:="${_debug_dir_}/trace.txt"}
-	if echo '' >> "${trace_file}"
-	then
-	    :
-	else
-	    # invalidate _debug_dir_
-	    _debug_dir_=''
-	    trace_file="/dev/stderr"
-	fi
-    fi
 fi
+
+# Utilities
+# =========
+urlencode() {
+    # urlencode <string>
+
+    old_lc_collate=$LC_COLLATE
+    LC_COLLATE=C
+
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:$i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-])
+		printf '%s' "$c"
+		;;
+            *)
+		printf '%%%02X' "'$c"
+		;;
+        esac
+    done
+
+    LC_COLLATE=$old_lc_collate
+}
+
+getHeaderValueFor ()
+{
+    header_regexpr_pattern="$1"
+
+    line_containing_header=$(
+	grep \
+	    --ignore-case \
+	    --regexp="${header_regexpr_pattern}:"
+			 )
+
+    header_value=$(
+	echo "${line_containing_header}" | \
+	    sed -n -e 's/[^:]*:[ \t]*\(.*\)$/\1/p'
+		)
+
+    echo "${header_value}"
+}
+
+# =========
+
+if [[ "${FILTER_DEBUG}" == "file" ]]
+then
+    : ${DEBUG_ROOT_DIR:="${HERE}/DEBUG"}
+    _document_uri_to_system_path_=$( urlencode "${REQUEST_URI}" )
+    _debug_dir_="${DEBUG_ROOT_DIR}/$( date '+%Y/%m/%d/%s' )-${_document_uri_to_system_path_}-request"
+    _log_files_dir_="${_debug_dir_}"
+
+    mkdir -m 777 -p "${_debug_dir_}" 2>/dev/null
+
+    # test if all the folders are OK
+
+    # 1. stderr redirection
+    : ${STDERR:="${_debug_dir_}/stderr.txt"}
+    if ( echo '' >> "${STDERR}" ) 2>/dev/null
+    then
+	# OK
+	:
+    else
+	# invalidate _debug_dir_
+	_debug_dir_='/tmp'
+	STDERR=/dev/stderr
+    fi
+    echo "Redirect stderr to ${STDERR}" 1>&2
+    exec 2>>"${STDERR}"
+
+    # 2. _log_files_dir_
+    : ${_log_file_:="${_log_files_dir_}/log.txt"}
+    if ( echo '' >> "${_log_file_}" ) 2>/dev/null
+    then
+	# OK
+	:
+    else
+	# invalidate _debug_file_
+	_log_file_="/dev/stderr"
+	# _log_files_dir_ may by wrong too
+	_trace_dir='/tmp'
+    fi
+else
+    STDERR='/dev/stderr'
+    _debug_dir_='/tmp'
+    _log_files_dir_='/tmp'
+    _log_file_='/dev/stderr'
+fi
+    
+logInfo ()
+{
+    echo "$@" | while read -r line
+    do
+       echo '===>[INFO] '"${line}"
+    done >> "${_log_file_}"
+}
+
+# default values if not previously set
+logTrace ()
+{
+    echo "$@" | while read -r line
+    do
+       echo '===>[TRACE] '"${line}"
+    done >> "${_log_file_}"
+}
+
 
 if [[ -x "${ENV_FILE}" ]]
 then
