@@ -213,6 +213,8 @@ then
     _guessed_authenticated_user_="${REMOTE_USER}"
 fi
 
+logTrace "Guessed user: ${_guessed_authenticated_user_}"
+
 case "${REQUEST_URI}" in
 
     /do/login* ) # same as <Location "/do/login"> in http.conf
