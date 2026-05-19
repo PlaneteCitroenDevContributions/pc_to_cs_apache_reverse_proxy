@@ -225,7 +225,7 @@ case "${REQUEST_URI}" in
 
     "/do/ok" )
 	#
-	# user has selected a document
+	# user entered a VIN number
 	#
 	jvin_field_in_body=$( sed -e '/VIN_OK_BUTTON/s/.*jvin=\([^\&]*\).*/\1/' "${in_file}" )
 	if [[ -n "${jvin_field_in_body}" ]]
